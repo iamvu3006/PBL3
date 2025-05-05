@@ -1,0 +1,14 @@
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Maven target directory
+target/
+
+# Other IDE files
+.vscode/
+.settings/
+.project
+.classpath
