@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-panel span {
+            margin-right: 15px;
+        }
+
+        .logout-btn {
+            background-color: white;
+            color: #4a90e2;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .welcome-message {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>E-Commerce</h1>
+    <div class="user-panel">
+        <span id="username-display"></span>
+        <button id="logout-btn" class="logout-btn">Đăng xuất</button>
+        <a href="/login" id="login-btn" style="display:none; color:white; margin-right:10px; text-decoration:none;">Đăng nhập</a>
+    </div>
+</div>
+
+<div class="content">
+    <div class="welcome-message">
+        <h2>Chào mừng đến với website của chúng tôi</h2>
+        <p>Đây là trang chủ của ứng dụng E-Commerce.</p>
+    </div>
+
+    <!-- Nội dung trang chủ -->
+    <div id="main-content">
+        <p>Nội dung trang chủ sẽ được hiển thị ở đây.</p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const usernameDisplay = document.getElementById('username-display');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginBtn = document.getElementById('login-btn');
+
+        // Kiểm tra session
+        fetch('/api/auth/check-session')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Đã đăng nhập
+                    usernameDisplay.textContent = 'Xin chào, ' + data.username;
+                    logoutBtn.style.display = 'block';
+                    loginBtn.style.display = 'none';
+                } else {
+                    // Chưa đăng nhập
+                    usernameDisplay.textContent = '';
+                    logoutBtn.style.display = 'none';
+                    loginBtn.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session:', error);
+            });
+
+        // Xử lý đăng xuất
+        logoutBtn.addEventListener('click', function() {
+            fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Đăng xuất thành công, reload trang
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error logging out:', error);
+                });
+        });
+    });
+</script>
+</body>
+</html>
