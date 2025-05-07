@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head><link rel="stylesheet" href="styles.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="style.css">  
+</head>
+<body>
+    <header>
+        <h1>Đăng nhập</h1>
+        <nav>
+            <a href="index.html">Trang chủ</a>
+            <a href="register.html">Đăng ký</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Thông tin đăng nhập</h2>
+        <form id="login-form">
+            <label for="login-username">Tên người dùng:</label>
+            <input type="text" id="login-username" name="login-username" required><br>
+
+            <label for="login-password">Mật khẩu:</label>
+            <input type="password" id="login-password" name="login-password" required><br>
+
+            <button type="submit">Đăng nhập</button>
+        </form>
+    </section>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.getElementById("login-form");
+    const redirectUrl = new URLSearchParams(window.location.search).get("redirect"); 
+
+    loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+      
+        const currentUser = username; 
+
+        if (username && password) {
+            localStorage.setItem("currentUser", currentUser); 
+
+            if (redirectUrl) {
+                window.location.href = redirectUrl; 
+            } else {
+                window.location.href = "index.html"; 
+            }
+        } else {
+            alert("Đăng nhập không thành công!");
+        }
+    });
+});  
+      function login() {
+    const username = document.getElementById("username").value;
+    localStorage.setItem("loggedInUser", username);
+    window.location.href = "index.html";
+}
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+
+            const account = accounts.find(acc => acc.username === username && acc.password === password);
+
+            if (account) {
+                alert('Đăng nhập thành công!');
+               
+                window.location.href = "index.html";
+            } else {
+                alert('Tên người dùng hoặc mật khẩu không đúng!');
+            }
+        });
+    </script>
+</body>
+</html>
