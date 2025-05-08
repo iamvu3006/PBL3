@@ -33,27 +33,41 @@
     </section>
 
     <script>
-        document.getElementById('register-form').addEventListener('submit', function(event) {
-            event.preventDefault();
+        document.addEventListener("DOMContentLoaded", function () {
+            const registerForm = document.getElementById("register-form");
 
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            registerForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                const username = document.getElementById("register-username").value;
+                const password = document.getElementById("register-password").value;
 
-            let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-
-            const newAccount = {
-                username: username,
-                email: email,
-                password: password
-            };
-
-            accounts.push(newAccount);
-
-            localStorage.setItem('accounts', JSON.stringify(accounts));
-
-            window.location.href = "login.html";
+                // Gửi request đăng ký đến API backend
+                fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Đăng ký thành công! Vui lòng đăng nhập.");
+                            window.location.href = "/login";
+                        } else {
+                            alert("Đăng ký thất bại: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi đăng ký:", error);
+                        alert("Có lỗi xảy ra, vui lòng thử lại.");
+                    });
+            });
         });
+
     </script>
 </body>
 </html>

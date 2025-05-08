@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head><link rel="stylesheet" href="styles.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Giỏ Hàng</h1>
+        <nav>
+            <a href="index.html">Trang Chủ</a>
+            <a href="checkout.html">Thanh Toán</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Sản phẩm trong giỏ hàng</h2>
+        <div id="cart-items"></div>
+        <button id="checkout">Tiến Hành Thanh Toán</button>
+    </section>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartItemsDiv = document.getElementById('cart-items');
+        if (cart.length === 0) {
+            cartItemsDiv.innerHTML = '<p>Giỏ hàng của bạn đang trống.</p>';
+        } else {
+            cart.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('cart-item');
+                itemDiv.innerHTML = `
+                    <h3>${item.name}</h3>
+                    <p>Giá: ${item.price.toLocaleString()} VND</p>
+                    <button onclick="removeFromCart(${item.id})">Xóa</button>
+                `;
+                cartItemsDiv.appendChild(itemDiv);
+            });
+        }
+
+        function removeFromCart(productId) {
+            const updatedCart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(updatedCart));
+            window.location.reload(); 
+        }
+
+        document.getElementById('checkout').addEventListener('click', function() {
+            if (cart.length > 0) {
+                window.location.href = 'checkout.html';
+            } else {
+                alert('Giỏ hàng trống, không thể thanh toán.');
+            }
+        });
+    </script>
+</body>
+</html>

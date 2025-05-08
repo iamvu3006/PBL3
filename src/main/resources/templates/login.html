@@ -1,36 +1,79 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html lang="vi">
+<head><link rel="stylesheet" href="styles.css">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<div class="login-container">
-    <h2>Đăng nhập</h2>
+    <header>
+        <h1>Đăng nhập</h1>
+        <nav>
+            <a href="index.html">Trang chủ</a>
+            <a href="register.html">Đăng ký</a>
+        </nav>
+    </header>
 
-    <form id="loginForm">
-        <div class="form-group">
-            <label for="username">Tên đăng nhập:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+    <section>
+        <h2>Thông tin đăng nhập</h2>
+        <form id="login-form">
+            <label for="login-username">Tên người dùng:</label>
+            <input type="text" id="login-username" name="login-username" required><br>
 
-        <div class="form-group">
-            <label for="password">Mật khẩu:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+            <label for="login-password">Mật khẩu:</label>
+            <input type="password" id="login-password" name="login-password" required><br>
 
-        <div class="form-group">
-            <button type="submit" class="btn-login">Đăng nhập</button>
-        </div>
+            <button type="submit">Đăng nhập</button>
+        </form>
+    </section>
 
-        <div class="register-link">
-            <p>Chưa có tài khoản? <a href="/register">Đăng ký ngay</a></p>
-        </div>
-    </form>
-</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("login-form");
+            const redirectUrl = new URLSearchParams(window.location.search).get("redirect");
 
-<script src="/js/login.js"></script>
+            loginForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                const username = document.getElementById("login-username").value;
+                const password = document.getElementById("login-password").value;
+
+                // Gửi request đăng nhập đến API backend
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Nếu đăng nhập thành công, lưu thông tin người dùng vào session
+                            sessionStorage.setItem("clientId", data.clientId);
+                            sessionStorage.setItem("username", data.username);
+                            sessionStorage.setItem("isLoggedIn", true);
+
+                            // Chuyển hướng đến trang sau khi đăng nhập
+                            if (redirectUrl) {
+                                window.location.href = redirectUrl;
+                            } else {
+                                window.location.href = "index.html";
+                            }
+                        } else {
+                            alert("Đăng nhập không thành công!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi đăng nhập:", error);
+                        alert("Có lỗi xảy ra, vui lòng thử lại.");
+                    });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -30,53 +30,49 @@
     </section>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-    const loginForm = document.getElementById("login-form");
-    const redirectUrl = new URLSearchParams(window.location.search).get("redirect"); 
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.getElementById("login-form");
+            const redirectUrl = new URLSearchParams(window.location.search).get("redirect");
 
-    loginForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
+            loginForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                const username = document.getElementById("login-username").value;
+                const password = document.getElementById("login-password").value;
 
-      
-        const currentUser = username; 
+                // Gửi request đăng nhập đến API backend
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Nếu đăng nhập thành công, lưu thông tin người dùng vào session
+                            sessionStorage.setItem("clientId", data.clientId);
+                            sessionStorage.setItem("username", data.username);
+                            sessionStorage.setItem("isLoggedIn", true);
 
-        if (username && password) {
-            localStorage.setItem("currentUser", currentUser); 
-
-            if (redirectUrl) {
-                window.location.href = redirectUrl; 
-            } else {
-                window.location.href = "index.html"; 
-            }
-        } else {
-            alert("Đăng nhập không thành công!");
-        }
-    });
-});  
-      function login() {
-    const username = document.getElementById("username").value;
-    localStorage.setItem("loggedInUser", username);
-    window.location.href = "index.html";
-}
-        document.getElementById('login-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-
-            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-
-            const account = accounts.find(acc => acc.username === username && acc.password === password);
-
-            if (account) {
-                alert('Đăng nhập thành công!');
-               
-                window.location.href = "index.html";
-            } else {
-                alert('Tên người dùng hoặc mật khẩu không đúng!');
-            }
+                            // Chuyển hướng đến trang sau khi đăng nhập
+                            if (redirectUrl) {
+                                window.location.href = redirectUrl;
+                            } else {
+                                window.location.href = "index.html";
+                            }
+                        } else {
+                            alert("Đăng nhập không thành công!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi đăng nhập:", error);
+                        alert("Có lỗi xảy ra, vui lòng thử lại.");
+                    });
+            });
         });
     </script>
 </body>

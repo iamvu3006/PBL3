@@ -1,121 +1,123 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
+<html lang="vi">
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <style>
-        .header {
-            background-color: #4a90e2;
-            color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            margin: 0;
-        }
-
-        .user-panel {
-            display: flex;
-            align-items: center;
-        }
-
-        .user-panel span {
-            margin-right: 15px;
-        }
-
-        .logout-btn {
-            background-color: white;
-            color: #4a90e2;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .content {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .welcome-message {
-            margin-bottom: 30px;
-        }
-    </style>
+    <title>Trang Chủ - Marketplace</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="header">
-    <h1>E-Commerce</h1>
-    <div class="user-panel">
-        <span id="username-display"></span>
-        <button id="logout-btn" class="logout-btn">Đăng xuất</button>
-        <a href="/login" id="login-btn" style="display:none; color:white; margin-right:10px; text-decoration:none;">Đăng nhập</a>
-    </div>
-</div>
+   <header>
+    <h1> Chợ Không Tốt </h1>
+    <nav>
+        <span id="user-info"></span> 
+        <a href="login.html" id="login-link">Đăng Nhập</a>
+        <a href="register.html">Đăng Ký</a>
+        <a href="cart.html" class="require-login" data-redirect="cart.html">Giỏ Hàng</a>
+        <a href="sell_product.html" class="sell-product-link">Đăng Tin</a>
+        <a href="#" id="logout-link" style="display:none;">Đăng Xuất</a> 
+    </nav>
+  </header>
 
-<div class="content">
-    <div class="welcome-message">
-        <h2>Chào mừng đến với website của chúng tôi</h2>
-        <p>Đây là trang chủ của ứng dụng E-Commerce.</p>
-    </div>
+  <section>
+    <h2>Tin đăng mới</h2>
+    <div class="product-container">
+      <div class="product-list"></div>
+    </div>  
+  </section>
 
-    <!-- Nội dung trang chủ -->
-    <div id="main-content">
-        <p>Nội dung trang chủ sẽ được hiển thị ở đây.</p>
-    </div>
-</div>
+  <script>
+    
+    
+    const products = JSON.parse(localStorage.getItem('products')) || [];
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const usernameDisplay = document.getElementById('username-display');
-        const logoutBtn = document.getElementById('logout-btn');
-        const loginBtn = document.getElementById('login-btn');
+    function displayProducts() {
+        const productList = document.querySelector('.product-list');
+        productList.innerHTML = ''; 
 
-        // Kiểm tra session
-        fetch('/api/auth/check-session')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Đã đăng nhập
-                    usernameDisplay.textContent = 'Xin chào, ' + data.username;
-                    logoutBtn.style.display = 'block';
-                    loginBtn.style.display = 'none';
-                } else {
-                    // Chưa đăng nhập
-                    usernameDisplay.textContent = '';
-                    logoutBtn.style.display = 'none';
-                    loginBtn.style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session:', error);
-            });
+        products.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.classList.add('product');
 
-        // Xử lý đăng xuất
-        logoutBtn.addEventListener('click', function() {
-            fetch('/api/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Đăng xuất thành công, reload trang
-                        window.location.reload();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error logging out:', error);
-                });
+            productDiv.innerHTML = `
+                <div class="product-link" onclick="viewProduct(${product.id})">
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>Giá: ${product.price.toLocaleString()} VND</p>
+                </div>
+                <button onclick="goToCheckout(${product.id})">Mua ngay</button>
+                <button onclick="addToCart(${product.id})">Thêm vào giỏ hàng</button>
+            `;
+
+            productList.appendChild(productDiv);
         });
+    }
+
+    function goToCheckout(productId) {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            localStorage.setItem('checkoutProduct', JSON.stringify(product));
+            window.location.href = 'checkout.html';
+        }
+    }
+
+    function addToCart(productId) {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Sản phẩm đã được thêm vào giỏ hàng!');
+        }
+    }
+
+    function viewProduct(productId) {
+        const product = products.find(p => p.id === productId);
+        if (product) {
+            localStorage.setItem('selectedProduct', JSON.stringify(product));
+            window.location.href = 'product_detail.html';  
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const userInfo = document.getElementById("user-info");
+        const loginLink = document.getElementById("login-link");
+        const logoutLink = document.getElementById("logout-link");
+
+        const loggedInUser = localStorage.getItem("loggedInUser");
+
+        if (loggedInUser) {
+            userInfo.textContent = `Xin chào, ${loggedInUser}`;
+            loginLink.style.display = "none"; 
+            logoutLink.style.display = "inline-block"; 
+        }
+
+         logoutLink.addEventListener("click", function () {
+            localStorage.removeItem("loggedInUser");
+            alert("Bạn đã đăng xuất!");
+            window.location.reload();
+        });
+         document.querySelector(".sell-product-link").addEventListener("click", function (event) {
+            if (!loggedInUser) {
+                event.preventDefault();
+                alert("Bạn cần đăng nhập để sử dụng tính năng này!");
+                window.location.href = "login.html?redirect=sell_product.html"; 
+            }
+        });
+
+        const sellProductLink = document.querySelector(".sell-product-link");
+        if (sellProductLink) {
+            sellProductLink.addEventListener("click", function (event) {
+                if (!currentUser) {
+                    event.preventDefault();
+                    alert("Bạn cần đăng nhập để sử dụng tính năng này!");
+                    window.location.href = "login.html?redirect=sell_product.html"; 
+                }
+            });
+        }
+
+        displayProducts();
     });
-</script>
+  </script>
 </body>
 </html>
