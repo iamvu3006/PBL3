@@ -1,73 +1,93 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head><link rel="stylesheet" href="styles.css">
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký tài khoản</title>
-    <link rel="stylesheet" href="style.css">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng ký tài khoản</title>
+  <!-- CSS chung -->
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+  <link rel="stylesheet" th:href="@{/css/auth.css}">
+  <style>
+    /* Nếu bạn dùng inline style, copy từ style cũ vào đây */
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Đăng ký tài khoản</h1>
-        <nav>
-            <a href="index.html">Trang chủ</a>
-            <a href="login.html">Đăng nhập</a>
-        </nav>
-    </header>
+  <header class="container header-container">
+    <nav class="nav-container">
+      <!-- Chuyển về "/" thay vì index.html -->
+      <a th:href="@{/}" class="nav-link">Trang chủ</a>
+      <!-- Chuyển về "/login" kèm redirect nếu có -->
+      <a th:href="@{/login(redirect=${param.redirect})}" class="nav-link">Đăng nhập</a>
+    </nav>
+  </header>
 
+  <main class="container">
     <section>
-        <h2>Thông tin tài khoản</h2>
-        <form id="register-form">
-            <label for="username">Tên người dùng:</label>
-            <input type="text" id="username" name="username" required><br>
+      <h2>Thông tin tài khoản</h2>
+      <form id="register-form">
+        <div id="error-message" class="alert alert-danger" style="display:none;"></div>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br>
+        <div class="form-group">
+          <label for="register-username">Tên người dùng:</label>
+          <input type="text" id="register-username" name="username" class="form-control" required>
+        </div>
 
-            <label for="password">Mật khẩu:</label>
-            <input type="password" id="password" name="password" required><br>
+        <div class="form-group">
+          <label for="register-email">Email:</label>
+          <input type="email" id="register-email" name="email" class="form-control" required>
+        </div>
 
-            <button type="submit">Đăng ký</button>
-        </form>
+        <div class="form-group">
+          <label for="register-password">Mật khẩu:</label>
+          <input type="password" id="register-password" name="password" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Đăng ký</button>
+      </form>
     </section>
+  </main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const registerForm = document.getElementById("register-form");
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const urlParams  = new URLSearchParams(window.location.search);
+      const redirectTo = urlParams.get("redirect") || "/login";
 
-            registerForm.addEventListener("submit", function (event) {
-                event.preventDefault();
-                const username = document.getElementById("register-username").value;
-                const password = document.getElementById("register-password").value;
+      const form   = document.getElementById("register-form");
+      const errDiv = document.getElementById("error-message");
 
-                // Gửi request đăng ký đến API backend
-                fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("Đăng ký thành công! Vui lòng đăng nhập.");
-                            window.location.href = "/login";
-                        } else {
-                            alert("Đăng ký thất bại: " + data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Lỗi đăng ký:", error);
-                        alert("Có lỗi xảy ra, vui lòng thử lại.");
-                    });
-            });
-        });
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        errDiv.style.display = "none";
 
-    </script>
+        const username = document.getElementById("register-username").value.trim();
+        const email    = document.getElementById("register-email").value.trim();
+        const password = document.getElementById("register-password").value;
+
+        try {
+          const resp = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ username, email, password })
+          });
+
+          const data = await resp.json();
+          if (!resp.ok) {
+            throw new Error(data.message || `Lỗi ${resp.status}`);
+          }
+
+          if (data.success) {
+            alert("Đăng ký thành công! Vui lòng đăng nhập.");
+            window.location.href = redirectTo;
+          } else {
+            throw new Error(data.message || "Đăng ký thất bại.");
+          }
+        } catch (err) {
+          console.error(err);
+          errDiv.innerText = err.message;
+          errDiv.style.display = "block";
+        }
+      });
+    });
+  </script>
 </body>
 </html>

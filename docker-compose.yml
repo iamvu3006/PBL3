@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: pbl3-db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      # Tạo database và thiết lập mật khẩu root
+      MYSQL_DATABASE: pbl3
+      MYSQL_ROOT_PASSWORD: root
+    # Chỉ expose nội bộ, không map ra host để tránh conflict
+    expose:
+      - "3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: pbl3-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      # Kết nối tới service 'db' trên mạng Docker
+      SPRING_DATASOURCE_URL: >-
+        jdbc:mysql://db:3306/pbl3
+        ?createDatabaseIfNotExist=true
+        &useSSL=false
+        &allowPublicKeyRetrieval=true
+        &serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+volumes:
+  db-data:
