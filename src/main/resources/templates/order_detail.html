@@ -1,47 +1,35 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head><link rel="stylesheet" href="styles.css">
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thông Tin Đơn Hàng</title>
-    <link rel="stylesheet" href="../../../../HTML/style.css">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Chi tiết đơn hàng</title>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 <body>
-    <header>
-        <h1>Thông Tin Đơn Hàng</h1>
-    </header>
+  <header class="container">
+    <h1>Thông Tin Đơn Hàng</h1>
+  </header>
 
+  <main class="container">
     <section>
-        <h2>Thông tin người mua</h2>
-        <div id="order-details">
-     
-        </div>
+      <h2>Thông tin người nhận</h2>
+      <p><strong>Họ và tên:</strong> <span th:text="${order.fullName}"></span></p>
+      <p><strong>Địa chỉ:</strong> <span th:text="${order.address}"></span></p>
+      <p><strong>Điện thoại:</strong> <span th:text="${order.phone}"></span></p>
     </section>
 
-    <script>
-
-        const orderDetails = JSON.parse(localStorage.getItem('lastOrder')) || {};
-
-        if (Object.keys(orderDetails).length > 0) {
-            const orderDetailsDiv = document.getElementById('order-details');
-            const { fullName, address, phone, cartItems, totalPrice } = orderDetails;
-
-            orderDetailsDiv.innerHTML = `
-                <h3>Thông tin người nhận</h3>
-                <p><strong>Họ và tên:</strong> ${fullName}</p>
-                <p><strong>Địa chỉ:</strong> ${address}</p>
-                <p><strong>Số điện thoại:</strong> ${phone}</p>
-
-                <h3>Chi tiết đơn hàng</h3>
-                <ul>
-                    ${cartItems.map(item => `<li>${item.name} - ${item.price.toLocaleString()} VND</li>`).join('')}
-                </ul>
-                <p><strong>Tổng giá trị đơn hàng:</strong> ${totalPrice.toLocaleString()} VND</p>
-            `;
-        } else {
-            document.getElementById('order-details').innerHTML = '<p>Không có đơn hàng nào.</p>';
-        }
-    </script>
+    <section>
+      <h2>Chi tiết sản phẩm</h2>
+      <ul>
+        <li th:each="item : ${order.items}">
+          <span th:text="${item.name}"></span> – <span th:text="${#numbers.formatInteger(item.price)}"></span> VND
+        </li>
+      </ul>
+      <p>
+        <strong>Tổng giá trị:</strong>
+        <span th:text="${#numbers.formatInteger(order.totalPrice)}"></span> VND
+      </p>
+    </section>
+  </main>
 </body>
 </html>

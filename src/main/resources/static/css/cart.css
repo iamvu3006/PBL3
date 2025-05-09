@@ -1,0 +1,77 @@
+/* cart.css */
+
+/* Breadcrumb */
+.breadcrumb {
+    font-size: 0.9rem;
+    margin: 10px 0 20px;
+    color: #555;
+  }
+  .breadcrumb a {
+    color: var(--secondary-color);
+    text-decoration: none;
+  }
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Khi giỏ trống */
+  .empty-cart {
+    text-align: center;
+    padding: 40px 0;
+  }
+  .empty-cart p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  .empty-cart .btn {
+    padding: 10px 20px;
+  }
+  
+  /* Bảng giỏ hàng (nếu chưa có trong common.css) */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .table th,
+  .table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  .table th {
+    background-color: var(--secondary-color);
+    color: #fff;
+  }
+  
+  /* Nút xóa trong bảng */
+  .table .btn-warning {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* Tóm tắt giỏ hàng */
+  .cart-summary {
+    text-align: right;
+    margin-top: 20px;
+  }
+  .cart-summary p {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+  .cart-summary .btn-primary {
+    padding: 10px 20px;
+  }
+  
+  /* Responsive: thu nhỏ trên mobile */
+  @media (max-width: 576px) {
+    .table th,
+    .table td {
+      font-size: 0.85rem;
+      padding: 8px;
+    }
+    .cart-summary p {
+      font-size: 1rem;
+    }
+  }
+  
