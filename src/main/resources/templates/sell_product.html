@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng bán sản phẩm</title>
+    <link rel="stylesheet" href="../../../../HTML/style.css">
+</head>
+<body>
+    <header>
+        <h1>Đăng bán sản phẩm</h1>
+        <nav>
+            <a href="../../../../HTML/index.html">Trang chủ</a>
+            <a href="../../../../HTML/login.html">Đăng nhập</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Thông tin sản phẩm</h2>
+        <form id="sell-form">
+            <label for="product-name">Tên sản phẩm:</label>
+            <input type="text" id="product-name" name="product-name" required><br>
+
+            <label for="product-price">Giá:</label>
+            <input type="text" id="product-price" name="product-price" required><br>
+
+            <label for="product-description">Mô tả:</label>
+            <textarea id="product-description" name="product-description" required></textarea><br>
+
+            <label for="product-image">Hình ảnh (URL):</label>
+            <input type="text" id="product-image" name="product-image" required><br>
+
+            <button type="submit">Đăng bán</button>
+        </form>
+    </section>
+
+    <script>
+        if (!localStorage.getItem('products')) {
+            localStorage.setItem('products', JSON.stringify([])); 
+        }
+
+        document.getElementById('sell-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('product-name').value;
+            const price = document.getElementById('product-price').value;
+            const description = document.getElementById('product-description').value;
+            const image = document.getElementById('product-image').value;
+
+            const product = {
+                name: name,
+                price: price,
+                description: description,
+                image: image
+            };
+
+            const products = JSON.parse(localStorage.getItem('products'));
+
+            products.push(product);
+
+            localStorage.setItem('products', JSON.stringify(products));
+
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+</html>

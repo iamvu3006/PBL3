@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+<h2>Search Results</h2>
+
+<ul>
+    <li th:each="item : ${products}">
+        <span th:text="${item.descripted.productName}"></span> -
+        <span th:text="${item.descripted.price} + ' VNĐ'"></span>
+    </li>
+</ul>
+
+<a href="/">Back</a>
+</body>
+</html>

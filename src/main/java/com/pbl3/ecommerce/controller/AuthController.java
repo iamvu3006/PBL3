@@ -25,21 +25,25 @@ public class AuthController {
 
     @GetMapping("/login")
     public String loginPage(HttpSession session) {
-        return "login";
+        Boolean isLoggedIn = (Boolean) session.getAttribute("isLoggedIn");
+        if (isLoggedIn != null && isLoggedIn) {
+            return "redirect:/"; // Nếu đã đăng nhập thì chuyển về trang chủ
+        }
+        return "login"; // Trả về trang login.html
     }
 
     @GetMapping("/register")
     public String registerPage(HttpSession session) {
         Boolean isLoggedIn = (Boolean) session.getAttribute("isLoggedIn");
         if (isLoggedIn != null && isLoggedIn) {
-            return "index"; // Nếu đã đăng nhập thì chuyển về trang chủ
+            return "redirect:/"; // Nếu đã đăng nhập thì chuyển về trang chủ
         }
         return "register"; // Trả về trang register.html
     }
 
     @GetMapping("/")
     public String homePage() {
-        return "index";
+        return "index"; // Trả về trang index.html (trang chủ)
     }
 
     // === API Controllers ===

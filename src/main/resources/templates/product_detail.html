@@ -1,0 +1,70 @@
+<!-- product_details.html -->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Tiết Sản Phẩm</title>
+    <link rel="stylesheet" href="../../../../HTML/style.css">
+</head>
+<body>
+    <header>
+        <h1>Chi Tiết Sản Phẩm</h1>
+        <nav>
+            <a href="../../../../HTML/index.html">Trang Chủ</a>
+            <a href="../../../../HTML/cart.html">Giỏ Hàng</a>
+        </nav>
+    </header>
+
+    <section id="product-detail">
+        <div class="image-slider">
+            <button id="prev" onclick="prevImage()">&#10094;</button>
+            <img id="product-image" src="" alt="Sản phẩm">
+            <button id="next" onclick="nextImage()">&#10095;</button>
+        </div>
+        <h2 id="product-name"></h2>
+        <p id="product-price"></p>
+        <p id="product-description"></p>
+        <button onclick="buyNow()">Mua ngay</button>
+        <button onclick="addToCart()">Thêm vào giỏ hàng</button>
+    </section>
+
+    <script>
+        const product = JSON.parse(localStorage.getItem('selectedProduct'));
+        let currentImageIndex = 0;
+
+        if (product) {
+            document.getElementById('product-name').innerText = product.name;
+            document.getElementById('product-price').innerText = `Giá: ${product.price.toLocaleString()} VND`;
+            document.getElementById('product-description').innerText = product.description || "Không có mô tả.";
+            document.getElementById('product-image').src = product.images[0];
+        }
+
+        function prevImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                document.getElementById('product-image').src = product.images[currentImageIndex];
+            }
+        }
+
+        function nextImage() {
+            if (currentImageIndex < product.images.length - 1) {
+                currentImageIndex++;
+                document.getElementById('product-image').src = product.images[currentImageIndex];
+            }
+        }
+
+        function buyNow() {
+            localStorage.setItem('checkoutProduct', JSON.stringify(product));
+            window.location.href = 'checkout.html';
+        }
+
+        function addToCart() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert('Sản phẩm đã được thêm vào giỏ hàng!');
+        }
+    </script>
+</body>
+</html>
