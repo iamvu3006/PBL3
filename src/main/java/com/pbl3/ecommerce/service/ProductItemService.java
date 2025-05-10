@@ -7,7 +7,6 @@ import com.pbl3.ecommerce.repository.ProductItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.util.*;
 
 @Service
@@ -26,9 +25,13 @@ public class ProductItemService {
         for (ProductItem item : items) {
             Map<String, Object> data = new HashMap<>();
             data.put("id", item.getProductItemID());
+            data.put("color", item.getColor());
+            data.put("ram", item.getRam());
+            data.put("inchs", item.getInchs());
+            data.put("internalmemory", item.getInternalmemory());
+            data.put("harddrivetype", item.getHardDriveType());
             data.put("brand", item.getBrand().getBrandName());
-            data.put("color", item.getColor().getColorName());
-            data.put("configuration", item.getConfiguration());
+            data.put("version", item.getBrand().getVersions());
             data.put("package", item.getTariffiPackage().getPackageName());
 
             List<Descripted> descriptions = descriptedRepository.findByProductItem(item);
