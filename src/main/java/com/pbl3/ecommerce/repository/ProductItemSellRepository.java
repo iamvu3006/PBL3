@@ -10,6 +10,11 @@ import java.util.List;
 
 @Repository
 public interface ProductItemSellRepository extends JpaRepository<ProductItem, Integer> {
-    @Query("SELECT p FROM ProductItem p WHERE p.sellCategory.sellCategoryID = :sellCategoryID")
-    List<ProductItem> ListProductBySellID(@Param("sellCategoryID") Integer sellCategoryID);
+
+    @Query(value = "SELECT * FROM productitem WHERE sell_categoryid = :sellCategoryID", nativeQuery = true)
+    List<ProductItem> findBySellCategoryIDNative(@Param("sellCategoryID") Integer sellCategoryID);
+
+    // Thêm truy vấn đếm tổng số sản phẩm, ko can cung duoc
+    @Query("SELECT COUNT(p) FROM ProductItem p")
+    long countAllProducts();
 }
