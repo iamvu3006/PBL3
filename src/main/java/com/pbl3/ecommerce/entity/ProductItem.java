@@ -11,6 +11,7 @@ public class ProductItem {
     private Integer productItemID;
 
     @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "pproducttype")
     private ProductType producttype;
 
     public ProductType getProducttype() {
@@ -22,30 +23,78 @@ public class ProductItem {
     }
 
     @ManyToOne
-    @JoinColumn(name = "Clientid")
+    @JoinColumn(name = "clientid")
     private AbClient abclient;
 
-    @ManyToOne
-    @JoinColumn(name = "ColorID")
-    private Color color;
+    @JoinColumn(name = "Color")
+    private String Color;
+
+    @JoinColumn(name = "ram")
+    private Integer Ram;
+
+    @JoinColumn(name = "inchs")
+    private String Inchs;
+
+    @JoinColumn(name = "internalmemory")
+    private Integer InternalMemory;
+
+    @JoinColumn(name = "harddrivetype")
+    private String HardDriveType;
 
     @ManyToOne
-    @JoinColumn(name = "ConfigurationID")
-    private Configuration configuration;
+    @JoinColumn(name = "brand")
+    private Brand Brandid;
 
     @ManyToOne
-    @JoinColumn(name = "BrandID")
-    private Brand brand;
+    @JoinColumn(name = "tariffi_packageid")
+    private TariffiPackage TariffiPackage;
 
     @ManyToOne
-    @JoinColumn(name = "TariffiPackageID")
-    private TariffiPackage tariffiPackage;
+    @JoinColumn(name = "sell_categoryid")
+    private SellCategory SellCategory;
 
-    @ManyToOne
-    @JoinColumn(name = "SellCategoryID")
-    private SellCategory sellCategory;
 
     // Getters & Setters
+    public String getInchs() {
+        return Inchs;
+    }
+
+    public void setInchs(String inchs) {
+        this.Inchs = inchs;
+    }
+
+    public String getColor() {
+        return Color;
+    }
+
+    public void setColor(String color) {
+        this.Color = color;
+    }
+
+    public Integer getRam() {
+        return Ram;
+    }
+
+    public void setRam(Integer ram) {
+        this.Ram = ram;
+    }
+
+    public Integer getInternalmemory() {
+        return InternalMemory;
+    }
+
+    public void setInternalmemory(Integer internalmemory) {
+        this.InternalMemory = internalmemory;
+    }
+
+    public Brand getBrand() {
+        return Brandid;
+    }
+
+    public void setBrand(Brand brand) {
+        this.Brandid = brand;
+    }
+
     public enum ProductType{
         Laptop, Phone
     }
@@ -57,48 +106,32 @@ public class ProductItem {
         this.productItemID = productItemID;
     }
 
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
-    public Brand getBrand() {
-        return brand;
-    }
-
-    public void setBrand(Brand brand) {
-        this.brand = brand;
-    }
-
     public TariffiPackage getTariffiPackage() {
-        return tariffiPackage;
+        return TariffiPackage;
     }
 
     public void setTariffiPackage(TariffiPackage tariffiPackage) {
-        this.tariffiPackage = tariffiPackage;
+        this.TariffiPackage = tariffiPackage;
     }
 
     public SellCategory getSellCategory() {
-        return sellCategory;
+        return SellCategory;
     }
 
     private void setSellCategory(SellCategory sellCategory) {
-        this.sellCategory = sellCategory;
+        this.SellCategory = sellCategory;
     }
 
     public AbClient getAbClient() {
         return abclient;
+    }
+
+    public String getHardDriveType() {
+        return HardDriveType;
+    }
+
+    public void setHardDriveType(String hardDriveType) {
+        HardDriveType = hardDriveType;
     }
 
     private void setAbClient(AbClient abClient) {
