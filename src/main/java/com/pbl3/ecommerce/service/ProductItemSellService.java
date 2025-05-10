@@ -20,7 +20,7 @@ public class ProductItemSellService{
 
     public List<ProductItemDTO> ListProductBySellID(Integer clientID)
     {
-        List<ProductItem> items = productItemSellRepository.ListProductBySellID(clientID);
+        List<ProductItem> items = productItemSellRepository.findBySellCategoryIDNative(clientID);
 
         List<ProductItemDTO> itemDTOList = new ArrayList<>();
 
@@ -29,7 +29,6 @@ public class ProductItemSellService{
             ProductItemDTO productItemDTO = new ProductItemDTO(item);
             itemDTOList.add(productItemDTO);
         }
-
         return itemDTOList;
     }
 }
