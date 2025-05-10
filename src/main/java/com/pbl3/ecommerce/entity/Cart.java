@@ -1,4 +1,4 @@
-package com.pbl3.ecommerce.cart;
+package com.pbl3.ecommerce.entity;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -6,8 +6,6 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
-
-import com.pbl3.ecommerce.entity.Product;
 
 @Component
 @SessionScope

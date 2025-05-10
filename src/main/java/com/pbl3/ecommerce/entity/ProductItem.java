@@ -1,7 +1,6 @@
 package com.pbl3.ecommerce.entity;
 import jakarta.persistence.*;
-
-
+import java.util.*;
 @Entity
 @Table(name = "productitem")
 public class ProductItem {
@@ -40,6 +39,9 @@ public class ProductItem {
 
     @JoinColumn(name = "harddrivetype")
     private String HardDriveType;
+
+    @OneToMany(mappedBy = "productItem")
+    private List<Descripted> descripteds;
 
     @ManyToOne
     @JoinColumn(name = "brand")
@@ -136,5 +138,12 @@ public class ProductItem {
 
     private void setAbClient(AbClient abClient) {
         this.abclient = abClient;
+    }
+    public List<Descripted> getDescripteds() {
+        return descripteds;
+    }
+
+    public void setDescripteds(List<Descripted> descripteds) {
+        this.descripteds = descripteds;
     }
 }
