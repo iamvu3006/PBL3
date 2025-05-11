@@ -157,3 +157,39 @@ section h2 {
     padding: 20px;
   }
 }
+.btn-register {
+  /* full width như form control */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 0;
+
+  /* background và text */
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+
+  /* bo góc + bỏ border */
+  border: none;
+  border-radius: var(--border-radius);
+
+  /* hiệu ứng chuyển đổi */
+  transition: background var(--transition), font-weight var(--transition), box-shadow var(--transition);
+
+  cursor: pointer;
+}
+
+/* khoảng cách giữa icon và chữ */
+.btn-register i {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+/* hover: đổi màu, đậm chữ, thêm shadow */
+.btn-register:hover {
+  background: var(--secondary-color);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
