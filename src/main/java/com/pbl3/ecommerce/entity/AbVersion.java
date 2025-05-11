@@ -10,7 +10,7 @@ public class AbVersion {
     private String versionName;
 
     @ManyToOne
-    @JoinColumn(name = "brandID")
+    @JoinColumn(name = "brandid")
     private Brand brand;
 
     // getters & setters

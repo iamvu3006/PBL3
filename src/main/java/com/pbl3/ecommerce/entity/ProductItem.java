@@ -11,7 +11,7 @@ public class ProductItem {
     private Integer productItemID;
 
     @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "pproducttype")
+    @Column(name = "producttype")
     private ProductType producttype;
 
     public ProductType getProducttype() {
@@ -26,19 +26,19 @@ public class ProductItem {
     @JoinColumn(name = "clientid")
     private AbClient abclient;
 
-    @JoinColumn(name = "Color")
+    @Column(name = "Color")
     private String Color;
 
-    @JoinColumn(name = "ram")
+    @Column(name = "ram")
     private Integer Ram;
 
-    @JoinColumn(name = "inchs")
+    @Column(name = "inchs")
     private String Inchs;
 
-    @JoinColumn(name = "internalmemory")
+    @Column(name = "internalmemory")
     private Integer InternalMemory;
 
-    @JoinColumn(name = "harddrivetype")
+    @Column(name = "harddrivetype")
     private String HardDriveType;
 
     @ManyToOne
@@ -53,6 +53,9 @@ public class ProductItem {
     @JoinColumn(name = "sell_categoryid")
     private SellCategory SellCategory;
 
+    @OneToOne(cascade = CascadeType.PERSIST) //Luu du luu cua descripted roi moi luu productitem
+    @JoinColumn(name = "describeid")
+    private Descripted descripted;
 
     // Getters & Setters
     public String getInchs() {
@@ -91,12 +94,21 @@ public class ProductItem {
         return Brandid;
     }
 
+    public Descripted getDescriptedID() {
+
+        return descripted;
+    }
+
+    public void setDescriptedID(Descripted descriptedID) {
+        descripted = descriptedID;
+    }
+
     public void setBrand(Brand brand) {
         this.Brandid = brand;
     }
 
     public enum ProductType{
-        Laptop, Phone
+        LAPTOP, PHONE
     }
     public Integer getProductItemID() {
         return productItemID;
@@ -118,7 +130,7 @@ public class ProductItem {
         return SellCategory;
     }
 
-    private void setSellCategory(SellCategory sellCategory) {
+    public void setSellCategory(SellCategory sellCategory) {
         this.SellCategory = sellCategory;
     }
 
@@ -134,7 +146,7 @@ public class ProductItem {
         HardDriveType = hardDriveType;
     }
 
-    private void setAbClient(AbClient abClient) {
+    public void setAbClient(AbClient abClient) {
         this.abclient = abClient;
     }
 }

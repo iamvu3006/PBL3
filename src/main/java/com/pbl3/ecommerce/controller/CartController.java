@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.pbl3.ecommerce.cart.Cart;
+import com.pbl3.ecommerce.entity.Cart;
 import com.pbl3.ecommerce.entity.Product;
 import com.pbl3.ecommerce.repository.ProductRepository;
 

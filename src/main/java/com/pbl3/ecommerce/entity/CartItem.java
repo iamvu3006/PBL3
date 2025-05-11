@@ -1,4 +1,4 @@
-package com.pbl3.ecommerce.cart;
+package com.pbl3.ecommerce.entity;
 
 public class CartItem {
     private Long productId;

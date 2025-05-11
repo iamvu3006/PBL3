@@ -2,21 +2,29 @@ package com.pbl3.ecommerce.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "descripted")
+@Table(name = "Descripted")
 public class Descripted {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "descriptionid")
     private Integer descriptionID;
+
+    @Column(name = "product_name")
     private String productName;
-    private Integer price;
-    private String address;
+
+    @Column(name = "Price")
+    private Integer Price;
+
+    @Column(name = "Address")
+    private String Address;
+
+    @Column(name = "warranty_period")
     private Integer warrantyPeriod;
 
-    @Column(columnDefinition = "TEXT")
-    private String descripted;
+    @Column(name = "descipted")
+    private String Descripted;
 
-    @ManyToOne
-    @JoinColumn(name = "productItemID")
+    @OneToOne(mappedBy = "descripted")
     private ProductItem productItem;
 
     // getters & setters
@@ -38,19 +46,19 @@ public class Descripted {
     }
 
     public Integer getPrice() {
-        return price;
+        return Price;
     }
 
     public void setPrice(Integer price) {
-        this.price = price;
+        this.Price = price;
     }
 
     public String getAddress() {
-        return address;
+        return Address;
     }
 
     public void setAddress(String address) {
-        this.address = address;
+        this.Address = address;
     }
 
     public Integer getWarrantyPeriod() {
@@ -62,18 +70,11 @@ public class Descripted {
     }
 
     public String getDescripted() {
-        return descripted;
+        return Descripted;
     }
-
     public void setDescripted(String descripted) {
-        this.descripted = descripted;
+        this.Descripted = descripted;
     }
 
-    public ProductItem getProductItem() {
-        return productItem;
-    }
 
-    public void setProductItem(ProductItem productItem) {
-        this.productItem = productItem;
-    }
 }
