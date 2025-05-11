@@ -1,6 +1,6 @@
 package com.pbl3.ecommerce.entity;
 import jakarta.persistence.*;
-
+import java.util.*;
 
 @Entity
 @Table(name = "productitem")
@@ -53,9 +53,12 @@ public class ProductItem {
     @JoinColumn(name = "sell_categoryid")
     private SellCategory SellCategory;
 
-    @OneToOne(cascade = CascadeType.PERSIST) //Luu du luu cua descripted roi moi luu productitem
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "describeid")
     private Descripted descripted;
+
+    @OneToMany(mappedBy = "productItem")
+    private List<Descripted> descripteds;
 
     // Getters & Setters
     public String getInchs() {
@@ -148,5 +151,13 @@ public class ProductItem {
 
     public void setAbClient(AbClient abClient) {
         this.abclient = abClient;
+    }
+
+    public Descripted getDescripted() {
+        return descripted;
+    }
+
+    public void setDescripted(Descripted descripted) {
+        this.descripted = descripted;
     }
 }

@@ -24,7 +24,8 @@ public class Descripted {
     @Column(name = "descipted")
     private String Descripted;
 
-    @OneToOne(mappedBy = "descripted")
+    @ManyToOne
+    @JoinColumn(name = "productItemID")
     private ProductItem productItem;
 
     // getters & setters
