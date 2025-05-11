@@ -456,18 +456,18 @@
             <div class="user-nav">
                 <span id="user-info"></span>
                 <!-- Login / Register với ID riêng -->
-                <a href="../login.html" id="login-link" class="nav-link">
-             <i class="fas fa-sign-in-alt"></i> Đăng Nhập
-              </a>
-                <a href="../register.html" id="register-link" class="nav-link">
-                <i class="fas fa-user-plus"></i> Đăng Ký
-              </a>
-               <!-- Chỉ những link này mới require-login -->
-                <a href="cart.html" class="nav-link require-login">
-                <i class="fas fa-shopping-cart"></i> Giỏ Hàng
+                <a href="login.html" id="login-link" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Đăng Nhập
                 </a>
-               <a href="../sell_product.html" class="nav-link require-login sell-product-link">
-               <i class="fas fa-plus-circle"></i> Đăng Tin
+                <a href="register.html" id="register-link" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Đăng Ký
+                </a>
+                <!-- Chỉ những link này mới require-login -->
+                <a href="cart.html" class="nav-link require-login">
+                    <i class="fas fa-shopping-cart"></i> Giỏ Hàng
+                </a>
+                <a href="sell_product.html" class="nav-link require-login sell-product-link">
+                    <i class="fas fa-plus-circle"></i> Đăng Tin
                 </a>
 
                 <a href="#" id="logout-link" class="nav-link" style="display:none;">
@@ -673,17 +673,17 @@
     document.addEventListener("DOMContentLoaded", function () {
         const user            = localStorage.getItem("loggedInUser");
         const loginLink       = document.getElementById("login-link");
-         const registerLink    = document.getElementById("register-link");
-         const logoutLink      = document.getElementById("logout-link");
-         const requireLinks    = document.querySelectorAll(".require-login");
-         const userInfo        = document.getElementById("user-info");
+        const registerLink    = document.getElementById("register-link");
+        const logoutLink      = document.getElementById("logout-link");
+        const requireLinks    = document.querySelectorAll(".require-login");
+        const userInfo        = document.getElementById("user-info");
 
-          if (user) {
-             userInfo.innerHTML        = `<i class="fas fa-user"></i> ${user}`;
-             loginLink.style.display    = "none";
-             registerLink.style.display = "none";
-             logoutLink.style.display   = "inline-block";
-          }
+        if (user) {
+            userInfo.innerHTML        = `<i class="fas fa-user"></i> ${user}`;
+            loginLink.style.display    = "none";
+            registerLink.style.display = "none";
+            logoutLink.style.display   = "inline-block";
+        }
 
         logoutLink.addEventListener("click", function (e) {
             e.preventDefault();
@@ -695,12 +695,12 @@
         });
 
         registerLink.addEventListener("click", e => {
-          e.preventDefault();
-     // Nếu bạn muốn người dùng quay về index.html sau khi đăng ký
-          const current = window.location.pathname.split("/").pop() || "index.html";
-           window.location.href = `register.html?redirect=${encodeURIComponent(current)}`;
+            e.preventDefault();
+            // Nếu bạn muốn người dùng quay về index.html sau khi đăng ký
+            const current = window.location.pathname.split("/").pop() || "index.html";
+            window.location.href = `register.html?redirect=${encodeURIComponent(current)}`;
         });
-        
+
         document.querySelector(".sell-product-link").addEventListener("click", function (event) {
             if (!loggedInUser) {
                 event.preventDefault();
@@ -709,15 +709,15 @@
             }
         });
 
-          requireLinks.forEach(link => {
-    link.addEventListener("click", e => {
-      if (!user) {
-        e.preventDefault();
-        const target = link.getAttribute("href");
-        window.location.href = `login.html?redirect=${encodeURIComponent(target)}`;
-          }
-       });
-     });
+        requireLinks.forEach(link => {
+            link.addEventListener("click", e => {
+                if (!user) {
+                    e.preventDefault();
+                    const target = link.getAttribute("href");
+                    window.location.href = `login.html?redirect=${encodeURIComponent(target)}`;
+                }
+            });
+        });
 
         requireLoginElements.forEach(element => {
             element.addEventListener("click", function(event) {
