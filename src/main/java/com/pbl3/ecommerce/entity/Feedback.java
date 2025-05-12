@@ -9,14 +9,19 @@ public class Feedback {
     private Integer feedBackID;
 
     private Integer rate;
+
     private String clientComment;
 
     @ManyToOne
     @JoinColumn(name = "clientID")
     private AbClient client;
 
-    // getters & setters
+    @ManyToOne
+    @JoinColumn(name = "targetclientfeedback")
+    private AbClient targetClient;
 
+
+// getters & setters
     public Integer getFeedBackID() {
         return feedBackID;
     }
@@ -47,5 +52,13 @@ public class Feedback {
 
     public void setClient(AbClient client) {
         this.client = client;
+    }
+
+    public AbClient getTargetClient() {
+        return targetClient;
+    }
+
+    public void setTargetClient(AbClient targetClient) {
+        this.targetClient = targetClient;
     }
 }
