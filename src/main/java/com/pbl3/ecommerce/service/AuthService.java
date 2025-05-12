@@ -1,6 +1,8 @@
 package com.pbl3.ecommerce.service;
 
-import com.pbl3.ecommerce.dto.AuthDto;
+import com.pbl3.ecommerce.dto.AuthResponse;
+import com.pbl3.ecommerce.dto.LoginRequest;
+import com.pbl3.ecommerce.dto.RegisterRequest;
 import com.pbl3.ecommerce.entity.AbClient;
 import com.pbl3.ecommerce.repository.AbClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,41 +23,38 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public AuthDto login(AuthDto loginRequest) {
+    public AuthResponse login(LoginRequest loginRequest) {
         Optional<AbClient> clientOptional = clientRepository.findByClientUseName(loginRequest.getUsername());
 
         if (clientOptional.isPresent()) {
             AbClient client = clientOptional.get();
             if (passwordEncoder.matches(loginRequest.getPassword(), client.getClientPassword())) {
-                return new AuthDto(true, "Đăng nhập thành công",
-                        client.getClientID(), client.getClientUseName(),
-                        null, client.getClientPhoneNumber(),
-                        client.getClientEmailAdress(), client.getClientAdress());
+                return new AuthResponse(true, "Đăng nhập thành công", client.getClientID(), client.getClientUseName());
             } else {
-                return new AuthDto(false, "Mật khẩu không chính xác");
+                return new AuthResponse(false, "Mật khẩu không chính xác");
             }
         } else {
-            return new AuthDto(false, "Tên đăng nhập không tồn tại");
+            return new AuthResponse(false, "Tên đăng nhập không tồn tại");
         }
     }
 
-    public AuthDto register(AuthDto registerRequest) {
+    public AuthResponse register(RegisterRequest registerRequest) {
         // Kiểm tra username đã tồn tại chưa
         if (clientRepository.existsByClientUseName(registerRequest.getUsername())) {
-            return new AuthDto(false, "Tên đăng nhập đã được sử dụng");
+            return new AuthResponse(false, "Tên đăng nhập đã được sử dụng");
         }
 
         // Kiểm tra email đã tồn tại chưa
         if (clientRepository.existsByClientEmailAdress(registerRequest.getEmail())) {
-            return new AuthDto(false, "Email đã được sử dụng");
+            return new AuthResponse(false, "Email đã được sử dụng");
         }
 
         // Kiểm tra số điện thoại đã tồn tại chưa
         if (clientRepository.existsByClientPhoneNumber(registerRequest.getPhoneNumber())) {
-            return new AuthDto(false, "Số điện thoại đã được sử dụng");
+            return new AuthResponse(false, "Số điện thoại đã được sử dụng");
         }
 
-        // Tạo client mới từ DTO
+        // Tạo client mới
         AbClient newClient = new AbClient();
         newClient.setClientUseName(registerRequest.getUsername());
         newClient.setClientPassword(passwordEncoder.encode(registerRequest.getPassword()));
@@ -67,9 +66,6 @@ public class AuthService {
         // Lưu client vào database
         AbClient savedClient = clientRepository.save(newClient);
 
-        return new AuthDto(true, "Đăng ký thành công",
-                savedClient.getClientID(), savedClient.getClientUseName(),
-                savedClient.getClientFullName(), savedClient.getClientPhoneNumber(),
-                savedClient.getClientEmailAdress(), savedClient.getClientAdress());
+        return new AuthResponse(true, "Đăng ký thành công", savedClient.getClientID(), savedClient.getClientUseName());
     }
 }
