@@ -9,47 +9,70 @@
   <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 <body>
-  <header class="container header-container">
-    <nav class="nav-container">
-      <a th:href="@{/}" class="nav-link">Trang chủ</a>
-      <a th:href="@{/login(redirect=${param.redirect})}" class="nav-link">Đăng nhập</a>
-    </nav>
-  </header>
+<!-- Header giữ nguyên như cũ -->
+<header class="container header-container">
+  <nav class="nav-container">
+    <a th:href="@{/index}" class="nav-link">Trang chủ</a>
+    <a th:href="@{/login(redirect=${param.redirect})}" class="nav-link">Đăng nhập</a>
+  </nav>
+</header>
 
-  <main class="container">
-    <section>
-      <h2>Thông tin tài khoản</h2>
+<!-- Nội dung chính -->
+<main class="container">
+  <section>
+    <h2>Thông tin tài khoản</h2>
 
-      <!-- Banner thông báo -->
-      <div id="error-message" class="alert alert-danger" style="display:none;"></div>
-      <div id="success-message" class="alert alert-success" style="display:none;"></div>
+    <!-- Banner thông báo -->
+    <div id="error-message" class="alert alert-danger" style="display:none;"></div>
+    <div id="success-message" class="alert alert-success" style="display:none;"></div>
 
-      <form id="register-form">
-        <div class="form-group">
-          <label for="register-username">Tên người dùng:</label>
-          <input type="text" id="register-username" name="username" class="form-control" required>
-        </div>
-        <div class="form-group">
-          <label for="register-email">Email:</label>
-          <input type="email" id="register-email" name="email" class="form-control" required>
-        </div>
-        <div class="form-group">
-          <label for="register-password">Mật khẩu:</label>
-          <input type="password" id="register-password" name="password" class="form-control" required>
-        </div>
-        <!-- Nếu bạn muốn có confirm password, thêm block dưới:
-        <div class="form-group">
-          <label for="register-confirm">Xác nhận mật khẩu:</label>
-          <input type="password" id="register-confirm" class="form-control" required>
-        </div> -->
-        <button type="submit" class="btn-register">
-         <i class="fas fa-user-plus"></i> Đăng ký
-        </button>
-      </form>
-    </section>
-  </main>
+    <form id="register-form" th:action="@{/api/auth/register}" method="post">
+      <!-- Họ và tên -->
+      <div class="form-group">
+        <label for="register-fullname">Họ và tên:</label>
+        <input type="text" id="register-fullname" name="fullName" class="form-control" required>
+      </div>
 
-  <script>
+      <!-- Tên đăng nhập -->
+      <div class="form-group">
+        <label for="register-username">Tên đăng nhập:</label>
+        <input type="text" id="register-username" name="username" class="form-control" required>
+      </div>
+
+      <!-- Số điện thoại -->
+      <div class="form-group">
+        <label for="register-phone">Số điện thoại:</label>
+        <input type="tel" id="register-phone" name="phoneNumber" class="form-control" required>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="register-email">Email:</label>
+        <input type="email" id="register-email" name="email" class="form-control" required>
+      </div>
+
+      <!-- Mật khẩu -->
+      <div class="form-group">
+        <label for="register-password">Mật khẩu:</label>
+        <input type="password" id="register-password" name="password" class="form-control" required>
+      </div>
+
+      <!-- Địa chỉ -->
+      <div class="form-group">
+        <label for="register-address">Địa chỉ:</label>
+        <input type="text" id="register-address" name="address" class="form-control" required>
+      </div>
+
+      <!-- Nút Đăng ký -->
+      <button type="submit" class="btn-register">
+        <i class="fas fa-user-plus"></i> Đăng ký
+      </button>
+    </form>
+  </section>
+</main>
+
+<script>
+  /* Phần script xử lý form giữ nguyên */
   document.addEventListener('DOMContentLoaded', () => {
     const registerForm   = document.getElementById('register-form');
     const errDiv         = document.getElementById('error-message');
@@ -57,80 +80,63 @@
     const urlParams      = new URLSearchParams(window.location.search);
     const redirectTo     = urlParams.get('redirect') || '/login';
 
-    // 1. Check session: nếu đã login thì về /
     fetch('/api/auth/check-session')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) window.location.href = '/';
-      })
-      .catch(console.error);
+            .then(r => r.json())
+            .then(data => {
+              if (data.success) window.location.href = '/';
+            })
+            .catch(console.error);
 
-    // 2. Xử lý submit form
     registerForm.addEventListener('submit', async e => {
       e.preventDefault();
-      // Ẩn banner cũ
       errDiv.style.display = 'none';
       successDiv.style.display = 'none';
 
-      // Lấy dữ liệu
+      const fullName = document.getElementById('register-fullname').value.trim();
       const username = document.getElementById('register-username').value.trim();
+      const phone    = document.getElementById('register-phone').value.trim();
       const email    = document.getElementById('register-email').value.trim();
       const password = document.getElementById('register-password').value;
-      // const confirm  = document.getElementById('register-confirm')?.value;
+      const address  = document.getElementById('register-address').value.trim();
 
-      // 3. Validate cơ bản
-      if (!username || !email || !password /*|| !confirm*/) {
+      if (!fullName || !username || !phone || !email || !password || !address) {
         return showError('Vui lòng nhập đầy đủ thông tin');
       }
-      // if (password !== confirm) {
-      //   return showError('Mật khẩu xác nhận không khớp');
-      // }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return showError('Email không hợp lệ');
-      }
+      if (!emailRegex.test(email)) return showError('Email không hợp lệ');
 
-      // 4. Gửi request
       try {
         const resp = await fetch('/api/auth/register', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ username, email, password })
+          body: JSON.stringify({ fullName, username, phoneNumber: phone, email, password, address })
         });
         const data = await resp.json();
-
-        if (!resp.ok || !data.success) {
-          throw new Error(data.message || 'Đăng ký thất bại');
-        }
-
-        // 5. Thành công
-        showSuccess(data.message || 'Đăng ký thành công! Chuyển đến đăng nhập…');
-        alert(data.message || 'Đăng ký thành công!');
-
+        if (!resp.ok || !data.success) throw new Error(data.message || 'Đăng ký thất bại');
+        showSuccess(data.message || 'Đăng ký thành công!');
         registerForm.reset();
-        setTimeout(() => {
-          window.location.href = redirectTo;
-        }, 2000);
-
+        setTimeout(() => window.location.href = redirectTo, 2000);
       } catch (err) {
         console.error(err);
         showError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
-        alert(err.message || 'Đăng ký không thành công!');
+      }
+
+      function showError(msg) {
+        successDiv.style.display = 'none';
+        errDiv.textContent = msg;
+        errDiv.style.display = 'block';
+      }
+      function showSuccess(msg) {
+        errDiv.style.display = 'none';
+        successDiv.textContent = msg;
+        successDiv.style.display = 'block';
       }
     });
-
-    function showError(msg) {
-      successDiv.style.display = 'none';
-      errDiv.textContent = msg;
-      errDiv.style.display = 'block';
-    }
-
-    function showSuccess(msg) {
-      errDiv.style.display = 'none';
-      successDiv.textContent = msg;
-      successDiv.style.display = 'block';
-    }
   });
-  </script>
+</script>
+
+<!-- Chèn footer chung -->
+<div th:insert="layout :: siteFooter"></div>
+
 </body>
 </html>
