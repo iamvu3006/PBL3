@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng ký tài khoản</title>
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/register.css}">
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+</head>
+<body>
+<header class="container header-container">
+  <nav class="nav-container">
+    <a th:href="@{/}" class="nav-link">Trang chủ</a>
+    <a th:href="@{/login(redirect=${param.redirect})}" class="nav-link">Đăng nhập</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section>
+    <h2>Thông tin tài khoản</h2>
+
+    <!-- Banner thông báo -->
+    <div id="error-message" class="alert alert-danger" style="display:none;"></div>
+    <div id="success-message" class="alert alert-success" style="display:none;"></div>
+
+    <form id="register-form">
+      <div class="form-group">
+        <label for="register-username">Tên người dùng:</label>
+        <input type="text" id="register-username" name="username" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="register-email">Email:</label>
+        <input type="email" id="register-email" name="email" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="register-password">Mật khẩu:</label>
+        <input type="password" id="register-password" name="password" class="form-control" required>
+      </div>
+      <!-- Nếu bạn muốn có xác nhận mật khẩu, bỏ comment dòng dưới -->
+      <!--
+      <div class="form-group">
+        <label for="register-confirm">Xác nhận mật khẩu:</label>
+        <input type="password" id="register-confirm" class="form-control" required>
+      </div>
+      -->
+      <button type="submit" class="btn-register">
+        <i class="fas fa-user-plus"></i> Đăng ký
+      </button>
+    </form>
+  </section>
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.getElementById('register-form');
+    const errDiv = document.getElementById('error-message');
+    const successDiv = document.getElementById('success-message');
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTo = urlParams.get('redirect') || '/login';
+
+    // Kiểm tra nếu đã đăng nhập thì chuyển hướng về trang chủ
+    fetch('/api/auth/check-session')
+            .then(r => r.json())
+            .then(data => {
+              if (data.success) window.location.href = '/';
+            })
+            .catch(console.error);
+
+    // Bắt sự kiện submit form
+    registerForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      errDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      const username = document.getElementById('register-username').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      // const confirm = document.getElementById('register-confirm')?.value;
+
+      // Kiểm tra dữ liệu cơ bản
+      if (!username || !email || !password) {
+        return showError('Vui lòng nhập đầy đủ thông tin');
+      }
+      // if (password !== confirm) {
+      //   return showError('Mật khẩu xác nhận không khớp');
+      // }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return showError('Email không hợp lệ');
+      }
+
+      // Gửi request đăng ký
+      try {
+        const resp = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ username, email, password })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok || !data.success) {
+          throw new Error(data.message || 'Đăng ký thất bại');
+        }
+
+        showSuccess(data.message || 'Đăng ký thành công! Chuyển đến đăng nhập…');
+        alert(data.message || 'Đăng ký thành công!');
+
+        registerForm.reset();
+        setTimeout(() => {
+          window.location.href = redirectTo;
+        }, 2000);
+
+      } catch (err) {
+        console.error(err);
+        showError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+        alert(err.message || 'Đăng ký không thành công!');
+      }
+    });
+
+    function showError(msg) {
+      successDiv.style.display = 'none';
+      errDiv.textContent = msg;
+      errDiv.style.display = 'block';
+    }
+
+    function showSuccess(msg) {
+      errDiv.style.display = 'none';
+      successDiv.textContent = msg;
+      successDiv.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
