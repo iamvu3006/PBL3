@@ -1,35 +1,58 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Chi tiết đơn hàng</title>
-  <link rel="stylesheet" th:href="@{/css/common.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đơn hàng</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+    <link rel="stylesheet" th:href="@{/css/layout.css}">
 </head>
 <body>
-  <header class="container">
-    <h1>Thông Tin Đơn Hàng</h1>
-  </header>
+    <header th:replace="layout :: siteHeader"></header>
 
-  <main class="container">
-    <section>
-      <h2>Thông tin người nhận</h2>
-      <p><strong>Họ và tên:</strong> <span th:text="${order.fullName}"></span></p>
-      <p><strong>Địa chỉ:</strong> <span th:text="${order.address}"></span></p>
-      <p><strong>Điện thoại:</strong> <span th:text="${order.phone}"></span></p>
-    </section>
+    <main class="container order-container">
+        <h1 class="section-title">Chi tiết Đơn Hàng #<span th:text="${order.id}">0</span></h1>
 
-    <section>
-      <h2>Chi tiết sản phẩm</h2>
-      <ul>
-        <li th:each="item : ${order.items}">
-          <span th:text="${item.name}"></span> – <span th:text="${#numbers.formatInteger(item.price)}"></span> VND
-        </li>
-      </ul>
-      <p>
-        <strong>Tổng giá trị:</strong>
-        <span th:text="${#numbers.formatInteger(order.totalPrice)}"></span> VND
-      </p>
-    </section>
-  </main>
+        <!-- Container hiện tại: thông tin đơn hàng -->
+        <div class="order-info">
+            <p><span class="lbl">Họ và tên:</span> <span th:text="${order.fullName}">Nguyễn Văn A</span></p>
+            <p><span class="lbl">Địa chỉ:</span> <span th:text="${order.address}">123 Đường ABC</span></p>
+            <p><span class="lbl">Số điện thoại:</span> <span th:text="${order.phone}">0123456789</span></p>
+            <p><span class="lbl">Tổng tiền:</span> <span th:text="${order.totalPrice}">0₫</span></p>
+        </div>
+
+        <!-- New: Container thông tin người dùng với link đến trang user -->
+        <aside class="user-link-container">
+            <h2 class="section-title">Thông tin người dùng</h2>
+            <div class="user-info">
+                <p>
+                    <a th:href="@{/users/{id}(id=${order.user.id})}" class="btn btn-primary">
+                        Xem trang người dùng
+                    </a>
+                </p>
+            </div>
+        </aside>
+
+        <h2 class="section-title">Các mặt hàng</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${order.items}">
+                    <td th:text="${item.productName}">Sản phẩm mẫu</td>
+                    <td th:text="${item.quantity}">1</td>
+                    <td th:text="${item.price}">0₫</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+
+    <div th:insert="layout :: siteFooter"></div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>

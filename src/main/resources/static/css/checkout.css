@@ -1,0 +1,162 @@
+/* checkout.css */
+
+/* Container chính */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.container h1 {
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Layout thanh toán */
+.checkout-container {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  flex-direction: column;
+}
+
+@media (min-width: 992px) {
+  .checkout-container {
+    flex-direction: row;
+  }
+}
+
+/* Phần form thông tin */
+.checkout-container > div:first-child {
+  flex: 2;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Phần tóm tắt đơn hàng */
+.checkout-container > div:last-child {
+  flex: 1;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  align-self: flex-start;
+}
+
+/* Form group */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #34495e;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Nút xác nhận */
+button[type="submit"] {
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+button[type="submit"]:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(41, 128, 185, 0.2);
+}
+
+/* Bảng tóm tắt đơn hàng */
+.checkout-container h2 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+th {
+  text-align: left;
+  padding: 0.75rem 0;
+  border-bottom: 2px solid #f0f2f5;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+td {
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+tfoot td {
+  font-weight: 600;
+  padding-top: 1.25rem;
+  border-bottom: none;
+}
+
+tfoot td:last-child {
+  color: #e74c3c;
+  font-size: 1.1rem;
+}
+
+/* Message */
+p[th|if] {
+  padding: 1rem;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .checkout-container > div {
+    padding: 1.5rem;
+  }
+  
+  table {
+    font-size: 0.9rem;
+  }
+}
