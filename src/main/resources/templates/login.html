@@ -149,6 +149,18 @@
     .facebook { background-color:#3b5998; }
     .google   { background-color:#db4437; }
     .github   { background-color:#333; }
+    .alert-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      padding: .75rem 1.25rem;
+      margin-bottom: 1rem;
+      border: 1px solid transparent;
+      border-radius: .375rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
     @media (max-width:768px) {
       .login-container { flex-direction:column; }
@@ -239,7 +251,7 @@
 
     // Submit form
     const form = document.getElementById("login-form");
-    const err  = document.getElementById("error-message");
+    const err = document.getElementById("error-message");
     const redirectUrl = new URLSearchParams(window.location.search).get("redirect");
 
     form.addEventListener("submit", async e => {
@@ -270,12 +282,22 @@
         if (!res.ok || !data.success) {
           throw new Error(data.message || 'Đăng nhập không thành công');
         }
+
         // Lưu session nếu cần
         sessionStorage.setItem("isLoggedIn", true);
         sessionStorage.setItem("username", data.username);
 
-        // Redirect về redirectUrl hoặc trang chủ
-        window.location.href = redirectUrl || '/';
+        // Thêm thông báo thành công
+        const successDiv = document.createElement('div');
+        successDiv.className = 'alert alert-success';
+        successDiv.innerHTML = '<i class="fas fa-check-circle"></i> Đăng nhập thành công! Đang chuyển hướng...';
+        form.insertBefore(successDiv, form.firstChild);
+
+        // Chuyển hướng đến layout.html sau 1.5 giây
+        setTimeout(() => {
+          window.location.href = redirectUrl || '/layout';
+        }, 1500);
+
       } catch (ex) {
         err.textContent = ex.message;
         err.style.display = 'block';

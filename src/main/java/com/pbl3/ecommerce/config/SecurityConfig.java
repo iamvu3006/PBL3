@@ -24,14 +24,30 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/**", "/css/**", "/js/**", "/images/**", "/", "/register", "/login").permitAll()
+                        // Cho phép truy cập công khai đến các resources và các trang không cần bảo vệ
+                        .requestMatchers(
+                                "/api/auth/**",
+                                "/css/**", "/js/**", "/images/**", "/webjars/**",
+                                "/", "/index", "/index.html",
+                                "/register", "/register.html",
+                                "/login", "/login.html",
+                                "/accessDenied", "/accessDenied.html"
+                        ).permitAll()
+                        // Các request khác yêu cầu xác thực
                         .anyRequest().authenticated()
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage("/login")
+                        .loginProcessingUrl("/api/auth/login") // URL xử lý form đăng nhập
+                        .defaultSuccessUrl("/", true) // Trang chuyển hướng sau khi đăng nhập thành công
+                        .failureUrl("/login?error=true") // Trang chuyển hướng nếu đăng nhập thất bại
                         .permitAll()
                 )
                 .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout") // URL xử lý đăng xuất
+                        .logoutSuccessUrl("/") // Trang chuyển hướng sau khi đăng xuất
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
         return http.build();

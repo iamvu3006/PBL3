@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -456,22 +456,18 @@
             <div class="user-nav">
                 <span id="user-info"></span>
                 <!-- Login / Register với ID riêng -->
-                <a href="login.html" id="login-link" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                <a th:href="@{/login}" id="login-link" class="nav-link">
+                <i class="fas fa-sign-in-alt"></i> Đăng Nhập
                 </a>
-                <a href="register.html" id="register-link" class="nav-link">
-                    <i class="fas fa-user-plus"></i> Đăng Ký
+                <a th:href="@{/register}" id="register-link" class="nav-link">
+                <i class="fas fa-user-plus"></i> Đăng Ký
                 </a>
                 <!-- Chỉ những link này mới require-login -->
-                <a href="cart.html" class="nav-link require-login">
+                <a th:href="@{/cart}" class="nav-link require-login">
                     <i class="fas fa-shopping-cart"></i> Giỏ Hàng
                 </a>
-                <a href="sell_product.html" class="nav-link require-login sell-product-link">
+                <a th:href="@{/sell_product}" class="nav-link require-login sell-product-link">
                     <i class="fas fa-plus-circle"></i> Đăng Tin
-                </a>
-
-                <a href="#" id="logout-link" class="nav-link" style="display:none;">
-                    <i class="fas fa-sign-out-alt"></i> Đăng Xuất
                 </a>
             </div>
         </div>
