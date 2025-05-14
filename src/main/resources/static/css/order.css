@@ -1,0 +1,145 @@
+/* Thêm vào file common.css hoặc tạo file mới order.css */
+
+/* Layout chung */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.order-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    color: #2c3e50;
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+/* Thông tin đơn hàng */
+.order-info {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.order-info p {
+    margin: 10px 0;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.lbl {
+    font-weight: 600;
+    color: #34495e;
+    display: inline-block;
+    width: 150px;
+}
+
+/* Thông tin người dùng */
+.user-link-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    text-align: center;
+}
+
+/* Bảng sản phẩm */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+table th {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+table tr:last-child td {
+    border-bottom: none;
+}
+
+table tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Nút */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .order-container {
+        padding: 15px;
+    }
+    
+    .lbl {
+        width: 120px;
+    }
+    
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* Hiệu ứng cho ID đơn hàng */
+.order-container h1 span {
+    color: #e74c3c;
+    font-weight: 700;
+}
+
+/* Hiệu ứng cho giá tiền */
+.order-info p span:last-child {
+    color: #e74c3c;
+    font-weight: 600;
+}
+
+table td:last-child {
+    color: #e74c3c;
+    font-weight: 600;
+}

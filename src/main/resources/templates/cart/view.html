@@ -1,76 +1,84 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{fragments/layout :: layout}">
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
 <head>
-  <title>Giỏ Hàng</title>
-  <link rel="stylesheet" th:href="@{/css/common.css}">
-  <link rel="stylesheet" th:href="@{/css/cart.css}">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Giỏ hàng</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}"/>
+    <link rel="stylesheet" th:href="@{/css/layout.css}"/>
 </head>
-
 <body>
-  <!-- chèn Header -->
-  <div layout:fragment="siteHeader"></div>
+    <!-- Header chung -->
+    <header th:replace="layout :: siteHeader"></header>
 
-  <main class="container">
-    <h1 class="section-title">Giỏ Hàng</h1>
+    <main class="container cart-container">
+        <h1 class="section-title">Giỏ hàng của bạn</h1>
 
-    <nav class="breadcrumb">
-      <a th:href="@{/}">Trang Chủ</a> &gt; <span>Giỏ Hàng</span>
-    </nav>
-
-    <section>
-      <!-- Khi giỏ trống -->
-      <div th:if="${#lists.isEmpty(items)}" class="empty-cart">
-        <p>Giỏ hàng của bạn đang trống.</p>
-        <a th:href="@{ / }" class="btn btn-primary">Tiếp tục mua sắm</a>
-      </div>
-
-      <!-- Khi có sản phẩm -->
-      <div th:if="${!#lists.isEmpty(items)}">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Sản phẩm</th>
-              <th>Đơn giá</th>
-              <th>Số lượng</th>
-              <th>Thành tiền</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="item : ${items}">
-              <td th:text="${item.name}">–</td>
-              <td th:text="${#numbers.formatDecimal(item.price,0,'','.',',')} + ' VND'">–</td>
-              <td th:text="${item.quantity}">–</td>
-              <td th:text="${#numbers.formatDecimal(item.price * item.quantity,0,'','.',',')} + ' VND'">–</td>
-              <td>
-                <form th:action="@{/cart/remove}" method="post">
-                  <!-- CSRF token -->
-                  <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                  <input type="hidden" name="productId" th:value="${item.productId}"/>
-                  <button type="submit" class="btn btn-warning">Xóa</button>
-                </form>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="cart-summary">
-          <p>
-            <strong>Tổng giá trị:</strong>
-            <span th:text="${#numbers.formatDecimal(total,0,'','.',',')} + ' VND'">–</span>
-          </p>
-          <form th:action="@{/cart/checkout}" method="post">
-            <input type="hidden" name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit" class="btn btn-primary">Tiến Hành Thanh Toán</button>
-          </form>
+        <!-- Khi giỏ trống -->
+        <div th:if="${#lists.isEmpty(items)}">
+            <p>Giỏ hàng đang trống.</p>
+            <p><a th:href="@{/products}" class="btn">Tiếp tục mua sắm</a></p>
         </div>
-      </div>
-    </section>
-  </main>
 
-  <!-- chèn Footer -->
-  <div layout:fragment="siteFooter"></div>
+        <!-- Khi có items -->
+        <div th:unless="${#lists.isEmpty(items)}">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Đơn giá</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${items}">
+                        <td>
+                            <a th:href="@{/products/{id}(id=${item.product.id})}"
+                               th:text="${item.product.name}">Tên sản phẩm</a>
+                        </td>
+                        <td>
+                            <img th:if="${item.product.imagePath != null}"
+                                 th:src="@{/images/{img}(img=${item.product.imagePath})}"
+                                 alt="Ảnh sản phẩm" class="product-thumb"/>
+                        </td>
+                        <td th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', '.', '₫')}">0₫</td>
+                        <td th:text="${item.quantity}">1</td>
+                        <td th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', '.', '₫')}">0₫</td>
+                        <td>
+                            <form th:action="@{/cart/remove}" method="post" style="display:inline">
+                                <!-- CSRF token nếu Spring Security bật -->
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="hidden" name="productId" th:value="${item.product.id}"/>
+                                <button type="submit" class="btn btn-danger">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="cart-summary">
+                <p>
+                    <strong>Tổng cộng:</strong>
+                    <span th:text="${#numbers.formatDecimal(total, 0, 'COMMA', '.', '₫')}">0₫</span>
+                </p>
+                <div class="cart-actions">
+                    <a th:href="@{/products}" class="btn">Tiếp tục mua sắm</a>
+                    <form th:action="@{/cart/checkout}" method="post" style="display:inline">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button type="submit" class="btn btn-primary">Thanh toán</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer chung -->
+    <div th:insert="layout :: siteFooter"></div>
+
+    <!-- FontAwesome hoặc JS khác -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>
