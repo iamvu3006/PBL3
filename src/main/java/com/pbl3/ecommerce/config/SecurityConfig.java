@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,48 +23,41 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authorize -> authorize
-                        // Cho phép truy cập công khai đến các resources và các trang không cần bảo vệ
+                .csrf(csrf -> csrf.disable()) // ❌ Tắt CSRF vì dùng API
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Cho phép CORS nếu dùng Postman / frontend
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
+                                "/api/auth/**", // ✅ Mở các API login, register, logout
                                 "/css/**", "/js/**", "/images/**", "/webjars/**",
                                 "/", "/index", "/index.html",
-                                "/register", "/register.html",
                                 "/login", "/login.html",
-                                "/accessDenied", "/accessDenied.html"
+                                "/register", "/register.html"
                         ).permitAll()
-                        // Các request khác yêu cầu xác thực
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated() // ✅ Các request khác phải đăng nhập
                 )
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/login")
-                        .loginProcessingUrl("/api/auth/login") // URL xử lý form đăng nhập
-                        .defaultSuccessUrl("/", true) // Trang chuyển hướng sau khi đăng nhập thành công
-                        .failureUrl("/login?error=true") // Trang chuyển hướng nếu đăng nhập thất bại
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout") // URL xử lý đăng xuất
-                        .logoutSuccessUrl("/") // Trang chuyển hướng sau khi đăng xuất
-                        .invalidateHttpSession(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll()
+                .formLogin(form -> form.disable()) // ❌ Tắt form login để không override login API
+                .httpBasic(httpBasic -> httpBasic.disable()) // ❌ Không dùng Basic Auth
+                .logout(logout -> logout.disable()) // ❌ Không dùng logout mặc định
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // ✅ Trả 401 nếu chưa đăng nhập
                 );
+
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList("*")); // ⚠ Có thể chỉnh sửa cho production
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setAllowCredentials(true); // Nếu bạn dùng session/cookie
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
+
     @Bean
     @Primary
     public PasswordEncoder passwordEncoder() {

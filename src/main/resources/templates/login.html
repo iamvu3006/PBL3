@@ -171,23 +171,8 @@
   </style>
 </head>
 <body>
-<div class="login-container">
-  <!-- Bên trái: greeting + link register -->
-  <div class="login-left">
-    <h1>Chào mừng trở lại</h1>
-    <p>Đăng nhập để truy cập tài khoản và khám phá ưu đãi dành riêng bạn</p>
-    <img src="https://cdn-icons-png.flaticon.com/512/3143/3143461.png" alt="Login Illustration">
-    <p>
-      Chưa có tài khoản?
-      <a th:href="@{/register(redirect=${param.redirect})}"
-         style="color: white; text-decoration: underline;">
-        Đăng ký ngay
-      </a>
-    </p>
-  </div>
-
   <!-- Bên phải: form login -->
-  <div class="login-right">
+  <div class="login-form">
     <div class="login-header">
       <h2>Đăng nhập</h2>
       <p>Vui lòng nhập thông tin đăng nhập</p>
@@ -239,73 +224,95 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Toggle mật khẩu
-    const togglePass = document.getElementById('toggle-password');
-    const passInput  = document.getElementById('login-password');
-    togglePass.addEventListener('click', () => {
-      const type = passInput.type === 'password' ? 'text' : 'password';
-      passInput.type = type;
-      togglePass.classList.toggle('fa-eye-slash');
-    });
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Ngăn form submit mặc định
 
-    // Submit form
-    const form = document.getElementById("login-form");
-    const err = document.getElementById("error-message");
-    const redirectUrl = new URLSearchParams(window.location.search).get("redirect");
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const errorElement = document.getElementById('error-message');
 
-    form.addEventListener("submit", async e => {
-      e.preventDefault();
-      err.style.display = 'none';
+    // Xóa thông báo lỗi trước đó
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
 
-      const username = document.getElementById("login-username").value.trim();
-      const password = document.getElementById("login-password").value.trim();
-      if (!username || !password) {
-        err.textContent = "Vui lòng nhập đầy đủ thông tin";
-        err.style.display = 'block';
-        return;
-      }
+    console.log("Attempting login for user:", username);
 
-      // Loading
-      const btn = form.querySelector('button[type="submit"]');
-      const orig = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-      btn.disabled = true;
+    // Dữ liệu đăng nhập
+    const loginData = {
+      username: username,
+      password: password
+    };
 
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || 'Đăng nhập không thành công');
-        }
+    console.log("Login payload:", JSON.stringify(loginData));
 
-        // Lưu session nếu cần
-        sessionStorage.setItem("isLoggedIn", true);
-        sessionStorage.setItem("username", data.username);
+    // Gửi request đăng nhập với debug
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(loginData),
+      credentials: 'same-origin' // Quan trọng để lưu session
+    })
+            .then(response => {
+              console.log("Response status:", response.status);
+              console.log("Response headers:", response.headers);
 
-        // Thêm thông báo thành công
-        const successDiv = document.createElement('div');
-        successDiv.className = 'alert alert-success';
-        successDiv.innerHTML = '<i class="fas fa-check-circle"></i> Đăng nhập thành công! Đang chuyển hướng...';
-        form.insertBefore(successDiv, form.firstChild);
+              // Log header content-type
+              const contentType = response.headers.get('content-type');
+              console.log("Content-Type:", contentType);
 
-        // Chuyển hướng đến layout.html sau 1.5 giây
-        setTimeout(() => {
-          window.location.href = redirectUrl || '/layout';
-        }, 1500);
+              // Kiểm tra response có status ok và content-type đúng
+              if (!response.ok) {
+                return response.text().then(text => {
+                  console.error("Error response:", text);
+                  throw new Error(`HTTP error! status: ${response.status}`);
+                });
+              }
 
-      } catch (ex) {
-        err.textContent = ex.message;
-        err.style.display = 'block';
-      } finally {
-        btn.innerHTML = orig;
-        btn.disabled = false;
-      }
-    });
+              if (contentType && contentType.includes('application/json')) {
+                return response.json();
+              } else {
+                // Nếu không phải JSON, log response text và throw error
+                return response.text().then(text => {
+                  console.error("Non-JSON response:", text);
+                  throw new Error('Không nhận được dữ liệu JSON từ server!');
+                });
+              }
+            })
+            .then(data => {
+              console.log('Response data:', data);
+
+              if (data.success) {
+                console.log('Login successful, redirecting...');
+                window.location.href = '/';
+              } else {
+                errorElement.textContent = data.message || 'Đăng nhập thất bại';
+                errorElement.style.display = 'block';
+                errorElement.style.color = 'red';
+              }
+            })
+            .catch(error => {
+              console.error('Login error:', error);
+              errorElement.textContent = error.message || 'Đã xảy ra lỗi khi đăng nhập';
+              errorElement.style.display = 'block';
+              errorElement.style.color = 'red';
+            });
+  });
+
+  // Thêm tính năng hiển thị/ẩn mật khẩu
+  document.getElementById('toggle-password').addEventListener('click', function() {
+    const passwordInput = document.getElementById('login-password');
+    if (passwordInput.type === 'password') {
+      passwordInput.type = 'text';
+      this.classList.remove('fa-eye');
+      this.classList.add('fa-eye-slash');
+    } else {
+      passwordInput.type = 'password';
+      this.classList.remove('fa-eye-slash');
+      this.classList.add('fa-eye');
+    }
   });
 </script>
 </body>
