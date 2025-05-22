@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+  <!-- Kéo phần <head> chung -->
+  <head th:replace="layout :: siteHead">
+    <title th:text="${product.productName} + ' | Chợ Không Tốt'">Chi tiết sản phẩm</title>
+  </head>
+
+  <body>
+    <!-- Header chung -->
+    <div th:replace="layout :: siteHeader"></div>
+
+    <main class="container product-detail">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb">
+        <a th:href="@{/}">Trang chủ</a> /
+        <a th:href="@{/categories/{id}(id=${product.sellCategoryId})}"
+           th:text="${product.categoryName}">Danh mục</a> /
+        <span th:text="${product.productName}">Tên sản phẩm</span>
+      </nav>
+
+      <div class="detail-grid">
+        <!-- 1. Ảnh lớn + gallery -->
+        <div class="images">
+          <img th:src="@{${product.imageUrl}}" alt="Ảnh chính" class="main-img"/>
+          <div class="thumbs">
+            <img th:each="img : ${product.imageUrls}"
+                 th:src="@{${img}}"
+                 alt="Ảnh phụ"
+                 class="thumb"/>
+          </div>
+        </div>
+
+        <!-- 2. Thông tin chính -->
+        <div class="info">
+          <h1 th:text="${product.productName}">Tên SP</h1>
+          <p class="price" th:text="${#numbers.formatInteger(product.price, #locale)} + ' ₫'">0 ₫</p>
+          <p class="warranty" th:text="'Bảo hành: ' + ${product.warranPeriod} + ' tháng'">Bảo hành</p>
+          <p class="address" th:text="'Địa chỉ: ' + ${product.address}">Địa chỉ bán</p>
+          <a th:href="@{/cart/add/{id}(id=${product.productitemId})}"
+             class="btn btn-primary">
+            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+          </a>
+        </div>
+
+        <!-- 3. Mô tả dài -->
+        <section class="description">
+          <h2>Mô tả sản phẩm</h2>
+          <p th:text="${product.descriptedProduct}">Mô tả chi tiết...</p>
+        </section>
+
+        <!-- 4. Thông số kỹ thuật -->
+        <section class="specs">
+          <h2>Thông số kỹ thuật</h2>
+          <table>
+            <tr>
+              <th>Thương hiệu</th>
+              <td th:text="${product.brandName}">Brand</td>
+            </tr>
+            <tr>
+              <th>Loại sản phẩm</th>
+              <td th:text="${product.productType}">Laptop/Phone</td>
+            </tr>
+            <tr>
+              <th>Kích thước (inch)</th>
+              <td th:text="${product.inchs}">15.6″</td>
+            </tr>
+            <tr>
+              <th>RAM</th>
+              <td th:text="${product.productRam} + ' GB'">8 GB</td>
+            </tr>
+            <tr>
+              <th>Bộ nhớ trong</th>
+              <td th:text="${product.internalMemory} + ' GB'">256 GB</td>
+            </tr>
+            <tr>
+              <th>Ổ cứng</th>
+              <td th:text="${product.configurationHardDrive}">SSD</td>
+            </tr>
+            <tr>
+              <th>Màu sắc</th>
+              <td th:text="${product.colorName}">Black</td>
+            </tr>
+            <tr>
+              <th>Phiên bản</th>
+              <td th:text="${product.version}">v1.0</td>
+            </tr>
+            <tr>
+              <th>Gói cước</th>
+              <td th:text="${product.tafiffPakageName}">Gói A</td>
+            </tr>
+          </table>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer chung -->
+    <div th:replace="layout :: siteFooter"></div>
+  </body>
+</html>
