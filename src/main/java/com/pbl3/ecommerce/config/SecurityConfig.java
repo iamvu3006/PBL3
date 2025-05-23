@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 
 import java.util.Arrays;
 
@@ -23,35 +25,50 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ❌ Tắt CSRF vì dùng API
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ Cho phép CORS nếu dùng Postman / frontend
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**", // ✅ Mở các API login, register, logout
+                                "/api/auth/**",
                                 "/css/**", "/js/**", "/images/**", "/webjars/**",
                                 "/", "/index", "/index.html",
                                 "/login", "/login.html",
                                 "/register", "/register.html"
                         ).permitAll()
-                        .anyRequest().authenticated() // ✅ Các request khác phải đăng nhập
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable()) // ❌ Tắt form login để không override login API
-                .httpBasic(httpBasic -> httpBasic.disable()) // ❌ Không dùng Basic Auth
-                .logout(logout -> logout.disable()) // ❌ Không dùng logout mặc định
+                .formLogin(form -> form.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            request.getSession().invalidate();
+                            response.setStatus(HttpStatus.OK.value());
+                        })
+                        .deleteCookies("JSESSIONID")
+                )
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // ✅ Trả 401 nếu chưa đăng nhập
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
+                .securityContext(context -> context
+                        .securityContextRepository(securityContextRepository())
                 );
 
         return http.build();
     }
 
     @Bean
+    public SecurityContextRepository securityContextRepository() {
+        return new HttpSessionSecurityContextRepository();
+    }
+
+    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("*")); // ⚠ Có thể chỉnh sửa cho production
+        config.setAllowedOrigins(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
-        config.setAllowCredentials(true); // Nếu bạn dùng session/cookie
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

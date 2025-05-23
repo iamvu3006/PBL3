@@ -1,6 +1,7 @@
 package com.pbl3.ecommerce.service;
 
 import com.pbl3.ecommerce.dto.PushProductItemDTO;
+import com.pbl3.ecommerce.dto.ProductItemDTO;
 import com.pbl3.ecommerce.entity.*;
 import com.pbl3.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class PushProductItemService {
@@ -17,6 +21,7 @@ public class PushProductItemService {
     private final BrandRepository brandRepository;
     private final TariffiPackageRepository tariffiPackageRepository;
     private final SellCategoryRepository sellCategoryRepository;
+    private final ProductItemSellRepository productItemSellRepository;
 
     @Autowired
     public PushProductItemService(
@@ -24,12 +29,14 @@ public class PushProductItemService {
             AbClientRepository clientRepository,
             BrandRepository brandRepository,
             TariffiPackageRepository tariffiPackageRepository,
-            SellCategoryRepository sellCategoryRepository) {
+            SellCategoryRepository sellCategoryRepository,
+            ProductItemSellRepository productItemSellRepository) {
         this.productItemRepository = productItemRepository;
         this.clientRepository = clientRepository;
         this.brandRepository = brandRepository;
         this.tariffiPackageRepository = tariffiPackageRepository;
         this.sellCategoryRepository = sellCategoryRepository;
+        this.productItemSellRepository = productItemSellRepository;
     }
 
     @Transactional
@@ -109,6 +116,18 @@ public class PushProductItemService {
 
         // Save the product item (Descripted will be saved via cascade)
         return productItemRepository.save(item);
+    }
+
+    public List<ProductItemDTO> ListProductBySellID(Integer clientID) {
+        List<ProductItem> items = productItemSellRepository.findBySellCategoryIDNative(clientID);
+
+        List<ProductItemDTO> itemDTOList = new ArrayList<>();
+
+        for (ProductItem item : items) {
+            ProductItemDTO productItemDTO = new ProductItemDTO(item);
+            itemDTOList.add(productItemDTO);
+        }
+        return itemDTOList;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.pbl3.ecommerce.service;
 
 import com.pbl3.ecommerce.dto.AuthResponse;
+import com.pbl3.ecommerce.dto.ClientDTO;
 import com.pbl3.ecommerce.dto.LoginRequest;
 import com.pbl3.ecommerce.dto.RegisterRequest;
 import com.pbl3.ecommerce.entity.AbClient;
@@ -75,5 +76,47 @@ public class AuthService {
             e.printStackTrace();
             return new AuthResponse(false, "Lỗi đăng ký: " + e.getMessage());
         }
+    }
+
+    // Lấy thông tin người dùng
+    public ClientDTO getClientProfile(Integer clientId) {
+        AbClient client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        return new ClientDTO(
+            client.getClientFullName(),
+            client.getClientPhoneNumber(),
+            client.getClientEmailAdress(),
+            client.getClientAdress()
+        );
+    }
+
+    public boolean updateClientProfile(Integer clientId, ClientDTO requestDTO) {
+        AbClient client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        if (!client.getClientPassword().equals(requestDTO.getCurrentPassword())) {
+            return false;
+        }
+
+        // cập nhật nếu có giá trị mới (không null)
+        if (requestDTO.getClientFullName() != null) {
+            client.setClientFullName(requestDTO.getClientFullName());
+        }
+
+        if (requestDTO.getClientPhoneNumber() != null) {
+            client.setClientPhoneNumber(requestDTO.getClientPhoneNumber());
+        }
+
+        if (requestDTO.getClientEmailAdress() != null) {
+            client.setClientEmailAdress(requestDTO.getClientEmailAdress());
+        }
+
+        if (requestDTO.getClientAdress() != null) {
+            client.setClientAdress(requestDTO.getClientAdress());
+        }
+
+        clientRepository.save(client);
+        return true;
     }
 }
