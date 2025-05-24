@@ -454,20 +454,23 @@
 
         <div class="nav-container">
             <div class="user-nav">
-                <span id="user-info"></span>
-                <!-- Login / Register với ID riêng -->
-                <a th:href="@{/login}" id="login-link" class="nav-link">
-                <i class="fas fa-sign-in-alt"></i> Đăng Nhập
-                </a>
-                <a th:href="@{/register}" id="register-link" class="nav-link">
-                <i class="fas fa-user-plus"></i> Đăng Ký
-                </a>
                 <!-- Chỉ những link này mới require-login -->
                 <a th:href="@{/cart}" class="nav-link require-login">
                     <i class="fas fa-shopping-cart"></i> Giỏ Hàng
                 </a>
                 <a th:href="@{/create}" class="nav-link require-login sell-product-link">
                     <i class="fas fa-plus-circle"></i> Đăng Tin
+                </a>
+                <a href="#" id="logout-link" class="nav-link" style="display:none;">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+                <span id="user-info"></span>
+                <!-- Login / Register với ID riêng -->
+                <a th:href="@{/login}" id="login-link" class="nav-link">
+                    <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                </a>
+                <a th:href="@{/register}" id="register-link" class="nav-link">
+                    <i class="fas fa-user-plus"></i> Đăng Ký
                 </a>
             </div>
         </div>
@@ -667,27 +670,42 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
-        const user            = localStorage.getItem("loggedInUser");
         const loginLink       = document.getElementById("login-link");
         const registerLink    = document.getElementById("register-link");
         const logoutLink      = document.getElementById("logout-link");
-        const requireLinks    = document.querySelectorAll(".require-login");
         const userInfo        = document.getElementById("user-info");
 
-        if (user) {
-            userInfo.innerHTML        = `<i class="fas fa-user"></i> ${user}`;
-            loginLink.style.display    = "none";
-            registerLink.style.display = "none";
-            logoutLink.style.display   = "inline-block";
-        }
+        // Kiểm tra trạng thái đăng nhập thực tế từ backend
+        fetch('/api/auth/check-session', { credentials: 'include' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Đã đăng nhập
+                    localStorage.setItem("loggedInUser", data.username);
+                    userInfo.innerHTML = `<i class="fas fa-user"></i> Xin chào, <b>${data.username}</b>`;
+                    loginLink.style.display    = "none";
+                    registerLink.style.display = "none";
+                    logoutLink.style.display   = "inline-block";
+                } else {
+                    // Chưa đăng nhập
+                    localStorage.removeItem("loggedInUser");
+                    userInfo.innerHTML = "";
+                    loginLink.style.display    = "inline-block";
+                    registerLink.style.display = "inline-block";
+                    logoutLink.style.display   = "none";
+                }
+            });
 
         logoutLink.addEventListener("click", function (e) {
             e.preventDefault();
-            localStorage.removeItem("loggedInUser");
-            showNotification("Bạn đã đăng xuất thành công!");
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+                .then(() => {
+                    localStorage.removeItem("loggedInUser");
+                    showNotification("Bạn đã đăng xuất thành công!");
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                });
         });
 
         registerLink.addEventListener("click", e => {
