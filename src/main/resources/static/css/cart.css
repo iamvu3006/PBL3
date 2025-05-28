@@ -13,7 +13,7 @@
   .breadcrumb a:hover {
     text-decoration: underline;
   }
-  
+
   /* Khi giỏ trống */
   .empty-cart {
     text-align: center;
@@ -26,7 +26,7 @@
   .empty-cart .btn {
     padding: 10px 20px;
   }
-  
+
   /* Bảng giỏ hàng (nếu chưa có trong common.css) */
   .table {
     width: 100%;
@@ -43,13 +43,13 @@
     background-color: var(--secondary-color);
     color: #fff;
   }
-  
+
   /* Nút xóa trong bảng */
   .table .btn-warning {
     padding: 6px 12px;
     font-size: 0.9rem;
   }
-  
+
   /* Tóm tắt giỏ hàng */
   .cart-summary {
     text-align: right;
@@ -62,7 +62,7 @@
   .cart-summary .btn-primary {
     padding: 10px 20px;
   }
-  
+
   /* Responsive: thu nhỏ trên mobile */
   @media (max-width: 576px) {
     .table th,
@@ -74,4 +74,3 @@
       font-size: 1rem;
     }
   }
-  

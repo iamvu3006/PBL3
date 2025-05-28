@@ -19,6 +19,12 @@ public class ProductItemDTO {
     private Integer internalMemory;
     private String brandName;
     private String tafiffPakageName;
+    private String descriptedProduct;
+    private String address;
+    private Integer price;
+    private Integer warranPeriod;
+    private String version;
+    private String productName;
 
     public ProductItemDTO(ProductItem item) {
         try {
@@ -96,6 +102,7 @@ public class ProductItemDTO {
         }
     }
 
+    public ProductItemDTO() {}
 
     // Getters
     public Integer getProductitemId() {
@@ -142,6 +149,30 @@ public class ProductItemDTO {
         return tafiffPakageName;
     }
 
+    public String getDescriptedProduct() {
+        return descriptedProduct;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public Integer getWarranPeriod() {
+        return warranPeriod;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
     public void setColorName(String colorName) {
         this.colorName = colorName;
     }
@@ -172,5 +203,29 @@ public class ProductItemDTO {
 
     public void setTafiffPakageName(String tafiffPakageName) {
         this.tafiffPakageName = tafiffPakageName;
+    }
+
+    public void setDescriptedProduct(String descriptedProduct) {
+        this.descriptedProduct = descriptedProduct;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public void setWarranPeriod(Integer warranPeriod) {
+        this.warranPeriod = warranPeriod;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }
