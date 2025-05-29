@@ -458,7 +458,7 @@
                 <a th:href="@{/cart}" class="nav-link require-login">
                     <i class="fas fa-shopping-cart"></i> Giỏ Hàng
                 </a>
-                <a th:href="@{/create}" class="nav-link require-login sell-product-link">
+                <a th:href="@{/api/products/create}" class="nav-link require-login ">
                     <i class="fas fa-plus-circle"></i> Đăng Tin
                 </a>
                 <a href="#" id="logout-link" class="nav-link" style="display:none;">
@@ -555,6 +555,11 @@
 <script>
     const products = JSON.parse(localStorage.getItem('products')) || [];
     const featuredProducts = products.length > 0 ? [...products].sort(() => 0.5 - Math.random()).slice(0, 4) : [];
+     const link = document.getElementById('register-link')
+  const path = window.location.pathname  
+  if (path.startsWith('/register')) {
+    link.classList.add('active') 
+  }
 
     function displayProducts() {
         const productList = document.getElementById('product-list');
@@ -708,12 +713,13 @@
                 });
         });
 
-        registerLink.addEventListener("click", e => {
-            e.preventDefault();
-            // Nếu bạn muốn người dùng quay về index.html sau khi đăng ký
-            const current = window.location.pathname.split("/").pop() || "index.html";
-            window.location.href = `register.html?redirect=${encodeURIComponent(current)}`;
-        });
+         registerLink.addEventListener('click', e => {
+      e.preventDefault();
+      // Lấy phần cuối của path, ví dụ "index", "create", "cart"
+      const current = window.location.pathname.split('/').pop() || 'index';
+      // Redirect tới /register với param redirect
+      window.location.href = `/register?redirect=${encodeURIComponent(current)}`;
+    });
 
         document.querySelector(".sell-product-link").addEventListener("click", function (event) {
             if (!loggedInUser) {
