@@ -1,6 +1,9 @@
 package com.pbl3.ecommerce.entity;
 import jakarta.persistence.*;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name = "productitem")
@@ -8,19 +11,11 @@ public class ProductItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer productItemID;
+    private Integer productItemId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "producttype")
     private ProductType producttype;
-
-    public ProductType getProducttype() {
-        return producttype;
-    }
-
-    public void setProducttype(ProductType producttype) {
-        this.producttype = producttype;
-    }
 
     @ManyToOne
     @JoinColumn(name = "clientid")
@@ -41,6 +36,13 @@ public class ProductItem {
     @Column(name = "harddrivetype")
     private String HardDriveType;
 
+    @Column(name = "normaldescribe")
+    private String NormalDescribe;
+
+    @ManyToOne
+    @JoinColumn(name = "versionid")
+    private AbVersion version;
+
     @ManyToOne
     @JoinColumn(name = "brand")
     private Brand Brandid;
@@ -53,14 +55,52 @@ public class ProductItem {
     @JoinColumn(name = "sell_categoryid")
     private SellCategory SellCategory;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.PERSIST) //Luu du luu cua descripted roi moi luu productitem
     @JoinColumn(name = "describeid")
     private Descripted descripted;
 
     @OneToMany(mappedBy = "productItem")
-    private List<Descripted> descripteds;
+    private List<ProductItemCategory> productItemCategories = new ArrayList<>();
 
     // Getters & Setters
+
+
+    public AbClient getAbclient() {
+        return abclient;
+    }
+
+    public Integer getInternalMemory() {
+        return InternalMemory;
+    }
+
+    public AbVersion getVersion() {
+        return version;
+    }
+
+    public Brand getBrandid() {
+        return Brandid;
+    }
+
+    public Descripted getDescripted() {
+        return descripted;
+    }
+
+    public String getNormalDescribe() {
+        return NormalDescribe;
+    }
+
+    public void setNormalDescribe(String normalDescribe) {
+        NormalDescribe = normalDescribe;
+    }
+
+    public ProductType getProducttype() {
+        return producttype;
+    }
+
+    public void setProducttype(ProductType producttype) {
+        this.producttype = producttype;
+    }
+
     public String getInchs() {
         return Inchs;
     }
@@ -113,21 +153,18 @@ public class ProductItem {
     public enum ProductType{
         LAPTOP, PHONE
     }
-    public Integer getProductItemID() {
-        return productItemID;
+    public Integer getProductItemId() {
+        return productItemId;
     }
 
-    private void setProductItemID(Integer productItemID) {
-        this.productItemID = productItemID;
+    private void setProductItemId(Integer productItemId) {
+        this.productItemId = productItemId;
     }
 
     public TariffiPackage getTariffiPackage() {
         return TariffiPackage;
     }
 
-    public void setTariffiPackage(TariffiPackage tariffiPackage) {
-        this.TariffiPackage = tariffiPackage;
-    }
 
     public SellCategory getSellCategory() {
         return SellCategory;
@@ -149,15 +186,4 @@ public class ProductItem {
         HardDriveType = hardDriveType;
     }
 
-    public void setAbClient(AbClient abClient) {
-        this.abclient = abClient;
-    }
-
-    public Descripted getDescripted() {
-        return descripted;
-    }
-
-    public void setDescripted(Descripted descripted) {
-        this.descripted = descripted;
-    }
 }
