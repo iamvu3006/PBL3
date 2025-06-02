@@ -84,10 +84,10 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
         return new ClientDTO(
-                client.getClientFullName(),
-                client.getClientPhoneNumber(),
-                client.getClientEmailAdress(),
-                client.getClientAdress()
+            client.getClientFullName(),
+            client.getClientPhoneNumber(),
+            client.getClientEmailAdress(),
+            client.getClientAdress()
         );
     }
 

@@ -10,12 +10,10 @@ public class WishListProduct {
 
     @ManyToOne
     @MapsId("wishListID")
-    @JoinColumn(name = "WishListID")
     private WishListCategory wishListCategory;
 
     @ManyToOne
     @MapsId("productItemID")
-    @JoinColumn(name = "ProductItemID")
     private ProductItem productItem;
 
     public WishListProduct() {}
@@ -23,7 +21,7 @@ public class WishListProduct {
     public WishListProduct(WishListCategory wishListCategory, ProductItem productItem) {
         this.wishListCategory = wishListCategory;
         this.productItem = productItem;
-        this.id = new WishListProductId(wishListCategory.getWishListID(), productItem.getProductItemID());
+        this.id = new WishListProductId(wishListCategory.getWishListID(), productItem.getProductItemId());
     }
 
     public WishListProductId getId() {
