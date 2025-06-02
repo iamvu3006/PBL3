@@ -9,10 +9,8 @@ public class WishListCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer wishListID;
 
-    @ManyToOne
-    @JoinColumn(name = "ClientID")
-    private AbClient client;
-
+    @OneToOne(mappedBy = "wishListCategory", optional = false)
+    private AbClient abClient;
     // Getters and setters
 
     public Integer getWishListID() {
@@ -23,11 +21,12 @@ public class WishListCategory {
         this.wishListID = wishListID;
     }
 
-    public AbClient getClient() {
-        return client;
+    public AbClient getAbClient() {
+        return abClient;
     }
 
-    public void setClient(AbClient client) {
-        this.client = client;
+    public void setAbClient(AbClient abClient) {
+        if(this.abClient != abClient)
+            this.abClient = abClient;
     }
 }
