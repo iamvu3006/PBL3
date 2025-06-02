@@ -1,5 +1,6 @@
 package com.pbl3.ecommerce.service;
 
+import com.pbl3.ecommerce.dto.PushProductItemDTO;
 import com.pbl3.ecommerce.dto.ProductItemDTO;
 import com.pbl3.ecommerce.entity.*;
 import com.pbl3.ecommerce.repository.*;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ProductItemService {
+public class PushProductItemService {
 
     private final ProductItemRepository productItemRepository;
     private final AbClientRepository clientRepository;
@@ -23,7 +24,7 @@ public class ProductItemService {
     private final ProductItemSellRepository productItemSellRepository;
 
     @Autowired
-    public ProductItemService(
+    public PushProductItemService(
             ProductItemRepository productItemRepository,
             AbClientRepository clientRepository,
             BrandRepository brandRepository,
@@ -39,30 +40,8 @@ public class ProductItemService {
     }
 
     @Transactional
-    public ProductItem createProductItem(ProductItemDTO dto) throws Exception {
-        // Validate required fields
-        if (dto.getProductName() == null || dto.getProductName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Tên sản phẩm không được để trống");
-        }
-        if (dto.getPrice() == null || dto.getPrice() <= 0) {
-            throw new IllegalArgumentException("Giá sản phẩm phải lớn hơn 0");
-        }
-        if (dto.getAddress() == null || dto.getAddress().trim().isEmpty()) {
-            throw new IllegalArgumentException("Địa chỉ không được để trống");
-        }
-        if (dto.getBrandName() == null || dto.getBrandName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Thương hiệu không được để trống");
-        }
-        if (dto.getVersion() == null || dto.getVersion().trim().isEmpty()) {
-            throw new IllegalArgumentException("Phiên bản không được để trống");
-        }
-        if (dto.getSellCategoryId() == null) {
-            throw new IllegalArgumentException("Danh mục không được để trống");
-        }
-        if (dto.getClientId() == null) {
-            throw new IllegalArgumentException("ID khách hàng không được để trống");
-        }
-
+    public ProductItem createProductItem(PushProductItemDTO dto) throws Exception {
+        // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
 
         // Set basic properties
@@ -73,8 +52,10 @@ public class ProductItemService {
         item.setHardDriveType(dto.getConfigurationHardDrive());
 
         // Set product type with validation
+        // Set product type with improved validation
         try {
-            String type = dto.getProductType() != null ? dto.getProductType().trim().toUpperCase() : "PHONE";
+            String type = dto.getProductType().trim().toUpperCase();
+
             if (type.equals("LAPTOP") || type.equals("PHONE")) {
                 item.setProducttype(ProductItem.ProductType.valueOf(type));
             } else {
@@ -87,37 +68,39 @@ public class ProductItemService {
 
         // Set client relationship with proper error handling
         AbClient client = clientRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new Exception("Không tìm thấy khách hàng với ID: " + dto.getClientId()));
+                .orElseThrow(() -> new Exception("Khong tim thay id khach hang: " + dto.getClientId()));
         item.setAbClient(client);
 
         // Set brand relationship with proper error handling
         Brand brand = brandRepository.findByBrandName(dto.getBrandName());
         if (brand == null) {
-            throw new Exception("Không tìm thấy thương hiệu: " + dto.getBrandName());
+            throw new Exception("Khong tim thay brand_name: " + dto.getBrandName() +" tai id khach hang la " + item.getAbClient().getClientID());
         }
         item.setBrand(brand);
 
         AbVersion Version = null;
+
         for(AbVersion v : brand.getVersions()){
             if(v.getVersionName().equalsIgnoreCase(dto.getVersion())){
                 Version = v;
                 break;
             }
         }
+
         if(Version == null) {
-            throw new Exception("Không tìm thấy phiên bản: " + dto.getVersion());
+            throw new Exception("Khong tim thay phien ban:" + dto.getVersion() + "tai khach hang id" + item.getAbClient().getClientID());
         }
 
         // Set tariff package relationship with proper error handling
         TariffiPackage tp = tariffiPackageRepository.findByPackageName(dto.getTafiffPakageName());
         if (tp == null) {
-            throw new Exception("Không tìm thấy gói cước: " + dto.getTafiffPakageName());
+            throw new Exception("khong tim thay goi cuoc: " + dto.getTafiffPakageName() + "tai id khach hang la" + item.getAbClient().getClientID());
         }
         item.setTariffiPackage(tp);
 
         // Set sell category relationship with proper error handling
         SellCategory sc = sellCategoryRepository.findById(dto.getSellCategoryId())
-                .orElseThrow(() -> new Exception("Không tìm thấy danh mục với ID: " + dto.getSellCategoryId()));
+                .orElseThrow(() -> new Exception("khong tim thay idsell tuong ung: " + dto.getSellCategoryId() + "tai id khach hang la" + item.getAbClient().getClientID()));
         item.setSellCategory(sc);
 
         // Create and populate Descripted entity
@@ -129,7 +112,7 @@ public class ProductItemService {
         descripted.setWarrantyPeriod(dto.getWarranPeriod());
 
         // Set up bidirectional relationship
-        item.setDescriptedID(descripted);
+        item.setDescriptedID(descripted); // This will also set the reverse relationship
 
         // Save the product item (Descripted will be saved via cascade)
         return productItemRepository.save(item);
@@ -137,11 +120,13 @@ public class ProductItemService {
 
     public List<ProductItemDTO> ListProductBySellID(Integer clientID) {
         List<ProductItem> items = productItemSellRepository.findBySellCategoryIDNative(clientID);
+
         List<ProductItemDTO> itemDTOList = new ArrayList<>();
+
         for (ProductItem item : items) {
             ProductItemDTO productItemDTO = new ProductItemDTO(item);
             itemDTOList.add(productItemDTO);
         }
         return itemDTOList;
     }
-} 
+}

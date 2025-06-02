@@ -33,7 +33,8 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**", "/webjars/**",
                                 "/", "/index", "/index.html",
                                 "/login", "/login.html",
-                                "/register", "/register.html","/cart","/cart.html","/create","/create.html","/api/products/create"
+                                "/register", "/register.html"
+//                                "/cart","/cart.html","/create","/create.html","/api/products/create"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

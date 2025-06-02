@@ -1,12 +1,11 @@
 package com.pbl3.ecommerce.controller;
 
 import com.pbl3.ecommerce.dto.ProductItemDTO;
-import com.pbl3.ecommerce.entity.AbClient;
+import com.pbl3.ecommerce.dto.PushProductItemDTO;
 import com.pbl3.ecommerce.entity.Brand;
 import com.pbl3.ecommerce.entity.SellCategory;
 import com.pbl3.ecommerce.entity.TariffiPackage;
-import com.pbl3.ecommerce.service.ProductItemService;
-import com.pbl3.ecommerce.repository.AbClientRepository;
+import com.pbl3.ecommerce.service.PushProductItemService;
 import com.pbl3.ecommerce.repository.BrandRepository;
 import com.pbl3.ecommerce.repository.SellCategoryRepository;
 import com.pbl3.ecommerce.repository.TariffiPackageRepository;
@@ -14,12 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import java.util.Optional;
 import java.security.Principal;
 import java.util.List;
 
@@ -28,7 +23,7 @@ import java.util.List;
 public class ProductItemController {
 
     @Autowired
-    private ProductItemService productItemService;
+    private PushProductItemService pushProductItemService;
     @Autowired
     private BrandRepository brandRepo;
     @Autowired
@@ -36,56 +31,41 @@ public class ProductItemController {
     @Autowired
     private TariffiPackageRepository tariffRepo;
 
-    @Autowired
-    public ProductItemController(ProductItemService productItemService, BrandRepository brandRepo, SellCategoryRepository sellCatRepo, TariffiPackageRepository tariffRepo) {
-        this.productItemService = productItemService;
-        this.brandRepo = brandRepo;
-        this.sellCatRepo = sellCatRepo;
-        this.tariffRepo = tariffRepo;
-    }
-
     @GetMapping
     public String showProductList(@RequestParam(name = "sellCategoryId", required = false) Integer sellCategoryId, Model model) {
+        // Nếu không truyền sellCategoryId thì không hiển thị gì hoặc hiển thị tất cả (tuỳ ý bạn)
         List<ProductItemDTO> products = (sellCategoryId != null)
-            ? productItemService.ListProductBySellID(sellCategoryId)
-            : List.of();
+                ? pushProductItemService.ListProductBySellID(sellCategoryId)
+                : List.of();
         model.addAttribute("products", products);
-        return "product_list";
+        return "product_list"; // Tên view Thymeleaf
     }
 
-    @GetMapping("/push_product")
+    /**
+     * Hiển thị form tạo/sửa sản phẩm.
+     */
+    @GetMapping("/push")
     public String showPushForm(Model model, Principal principal) {
-        System.out.println("⚠ Controller showPushForm() được gọi");
-        model.addAttribute("pushDto", new ProductItemDTO());
+        // 1. DTO trống cho form
+        model.addAttribute("pushDto", new PushProductItemDTO());
 
+        // 2. Danh sách Brand để select
         List<Brand> brands = brandRepo.findAll();
         model.addAttribute("brands", brands);
 
+        // 3. Danh sách SellCategory để select
         List<SellCategory> categories = sellCatRepo.findAll();
         model.addAttribute("categories", categories);
 
+        // 4. Danh sách TariffiPackage để select
         List<TariffiPackage> tariffs = tariffRepo.findAll();
         model.addAttribute("tariffs", tariffs);
+
+        // 5. clientId (lấy từ login user, giả sử principal.getName() chính là clientId)
+        model.addAttribute("clientId", Integer.valueOf(principal.getName()));
 
         return "push_product";
     }
 
-    @PostMapping("/create")
-    @ResponseBody
-    public String createProduct(@RequestBody ProductItemDTO dto) throws Exception {
-        try {
-            productItemService.createProductItem(dto);
-            return "Đăng bán sản phẩm thành công!";
-        } catch (Exception e) {
-            // Log error
-            throw new RuntimeException("Có lỗi xảy ra khi tạo sản phẩm", e);
-        }
-    }
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        model.addAttribute("brands", brandRepo.findAll());
-        model.addAttribute("categories", sellCatRepo.findAll());
-        model.addAttribute("tariffs", tariffRepo.findAll());
-        return "create";
-    }
+    // Nếu cần search, bạn cần bổ sung hàm search vào PushProductItemService
 }
