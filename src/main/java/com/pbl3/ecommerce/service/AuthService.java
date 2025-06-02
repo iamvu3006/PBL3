@@ -1,10 +1,10 @@
 package com.pbl3.ecommerce.service;
 
 import com.pbl3.ecommerce.dto.AuthResponse;
-import com.pbl3.ecommerce.dto.ClientDTO;
 import com.pbl3.ecommerce.dto.LoginRequest;
 import com.pbl3.ecommerce.dto.RegisterRequest;
 import com.pbl3.ecommerce.entity.AbClient;
+import com.pbl3.ecommerce.entity.WishListCategory;
 import com.pbl3.ecommerce.repository.AbClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,97 +26,51 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest loginRequest) {
         Optional<AbClient> clientOptional = clientRepository.findByClientUseName(loginRequest.getUsername());
-        try {
-            if (clientOptional.isPresent()) {
-                AbClient client = clientOptional.get();
-                if (passwordEncoder.matches(loginRequest.getPassword(), client.getClientPassword())) {
-                    return new AuthResponse(true, "Đăng nhập thành công", client.getClientID(), client.getClientUseName());
-                } else {
-                    return new AuthResponse(false, "Mật khẩu không chính xác");
-                }
+
+        if (clientOptional.isPresent()) {
+            AbClient client = clientOptional.get();
+            if (passwordEncoder.matches(loginRequest.getPassword(), client.getClientPassword())) {
+                return new AuthResponse(true, "Đăng nhập thành công", client.getClientID(), client.getClientUseName());
             } else {
-                return new AuthResponse(false, "Tên đăng nhập không tồn tại");
+                return new AuthResponse(false, "Mật khẩu không chính xác");
             }
-        } catch (Exception e) {
-            // Log lỗi và trả về thông báo
-            e.printStackTrace();
-            return new AuthResponse(false, "Lỗi hệ thống: " + e.getMessage());
+        } else {
+            return new AuthResponse(false, "Tên đăng nhập không tồn tại");
         }
     }
 
     public AuthResponse register(RegisterRequest registerRequest) {
-        try {
-            if (clientRepository.existsByClientUseName(registerRequest.getUsername())) {
-                return new AuthResponse(false, "Tên đăng nhập đã được sử dụng");
-            }
-
-            // Kiểm tra email đã tồn tại chưa
-            if (clientRepository.existsByClientEmailAdress(registerRequest.getEmail())) {
-                return new AuthResponse(false, "Email đã được sử dụng");
-            }
-
-            // Kiểm tra số điện thoại đã tồn tại chưa
-            if (clientRepository.existsByClientPhoneNumber(registerRequest.getPhoneNumber())) {
-                return new AuthResponse(false, "Số điện thoại đã được sử dụng");
-            }
-
-            // Tạo client mới
-            AbClient newClient = new AbClient();
-            newClient.setClientUseName(registerRequest.getUsername());
-            newClient.setClientPassword(passwordEncoder.encode(registerRequest.getPassword()));
-            newClient.setClientFullName(registerRequest.getFullName());
-            newClient.setClientPhoneNumber(registerRequest.getPhoneNumber());
-            newClient.setClientEmailAdress(registerRequest.getEmail());
-            newClient.setClientAdress(registerRequest.getAddress());
-
-            // Lưu client vào database
-            AbClient savedClient = clientRepository.save(newClient);
-            return new AuthResponse(true, "Đăng ký thành công", savedClient.getClientID(), savedClient.getClientUseName());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new AuthResponse(false, "Lỗi đăng ký: " + e.getMessage());
-        }
-    }
-
-    // Lấy thông tin người dùng
-    public ClientDTO getClientProfile(Integer clientId) {
-        AbClient client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client not found"));
-
-        return new ClientDTO(
-            client.getClientFullName(),
-            client.getClientPhoneNumber(),
-            client.getClientEmailAdress(),
-            client.getClientAdress()
-        );
-    }
-
-    public boolean updateClientProfile(Integer clientId, ClientDTO requestDTO) {
-        AbClient client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client not found"));
-
-        if (!client.getClientPassword().equals(requestDTO.getCurrentPassword())) {
-            return false;
+        // Kiểm tra username đã tồn tại chưa
+        if (clientRepository.existsByClientUseName(registerRequest.getUsername())) {
+            return new AuthResponse(false, "Tên đăng nhập đã được sử dụng");
         }
 
-        // cập nhật nếu có giá trị mới (không null)
-        if (requestDTO.getClientFullName() != null) {
-            client.setClientFullName(requestDTO.getClientFullName());
+        // Kiểm tra email đã tồn tại chưa
+        if (clientRepository.existsByClientEmailAdress(registerRequest.getEmail())) {
+            return new AuthResponse(false, "Email đã được sử dụng");
         }
 
-        if (requestDTO.getClientPhoneNumber() != null) {
-            client.setClientPhoneNumber(requestDTO.getClientPhoneNumber());
+        // Kiểm tra số điện thoại đã tồn tại chưa
+        if (clientRepository.existsByClientPhoneNumber(registerRequest.getPhoneNumber())) {
+            return new AuthResponse(false, "Số điện thoại đã được sử dụng");
         }
 
-        if (requestDTO.getClientEmailAdress() != null) {
-            client.setClientEmailAdress(requestDTO.getClientEmailAdress());
-        }
+        // Tạo client mới
+        AbClient newClient = new AbClient();
+        newClient.setClientUseName(registerRequest.getUsername());
+        newClient.setClientPassword(passwordEncoder.encode(registerRequest.getPassword()));
+        newClient.setClientFullName(registerRequest.getFullName());
+        newClient.setClientPhoneNumber(registerRequest.getPhoneNumber());
+        newClient.setClientEmailAdress(registerRequest.getEmail());
+        newClient.setClientAdress(registerRequest.getAddress());
 
-        if (requestDTO.getClientAdress() != null) {
-            client.setClientAdress(requestDTO.getClientAdress());
-        }
+        //tu dong tao moi wishlist
+        WishListCategory wishListCategory = new WishListCategory();
+        wishListCategory.setAbClient(newClient);
+        newClient.setWishListCategory(wishListCategory);
+        // Lưu client vào database
+        AbClient savedClient = clientRepository.save(newClient);
 
-        clientRepository.save(client);
-        return true;
+        return new AuthResponse(true, "Đăng ký thành công", savedClient.getClientID(), savedClient.getClientUseName());
     }
 }
