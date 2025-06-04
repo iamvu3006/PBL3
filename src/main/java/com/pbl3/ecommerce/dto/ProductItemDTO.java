@@ -7,93 +7,97 @@ import org.slf4j.LoggerFactory;
 public class ProductItemDTO {
     private static final Logger logger = LoggerFactory.getLogger(ProductItemDTO.class);
 
-    private Integer productitemId;
-    private Integer clientId;
-    private Integer sellCategoryId;
     private String clientPhoneNumber;
+    private String descripted;
     private String colorName;
     private String configurationHardDrive;
     private String productType;
     private String Inchs;
+    private String normalDescribe;
+    private String version;
     private Integer productRam;
     private Integer internalMemory;
     private String brandName;
     private String tafiffPakageName;
-    private String descriptedProduct;
-    private String address;
-    private Integer price;
-    private Integer warranPeriod;
-    private String version;
-    private String productName;
 
     public ProductItemDTO(ProductItem item) {
         try {
-            this.productitemId = item.getProductItemID();
+
 
             if (item.getAbClient() != null) {
-                this.clientId = item.getAbClient().getClientID();
-
                 if (item.getAbClient().getClientPhoneNumber() != null) {
                     this.clientPhoneNumber = item.getAbClient().getClientPhoneNumber();
                 } else {
                     logger.warn("Số điện thoại không có tại client có ID: {}", item.getAbClient().getClientID());
                 }
             } else {
-                logger.warn("AbClient là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("AbClient là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
-            if (item.getSellCategory() != null) {
-                this.sellCategoryId = item.getSellCategory().getSellCategoryID();
-            } else {
-                logger.warn("SellCategory là null cho ProductItem có ID: {}", item.getProductItemID());
+            if(item.getVersion().getVersionName() != null){
+                this.version = item.getVersion().getVersionName();
+            } else{
+                logger.warn("Co loi khi lay so phien ban san pham tai san pham:{}", item.getProductItemId());
+            }
+
+            if(item.getNormalDescribe() != null){
+                this.normalDescribe = item.getNormalDescribe();
+            } else{
+                logger.warn("Mo ta don gian khong co tai san pham co if: {}", item.getProductItemId());
             }
 
             if (item.getBrand() != null) {
                 this.brandName = item.getBrand().getBrandName();
             } else {
-                logger.warn("Brand là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("Brand là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getColor() != null) {
                 this.colorName = item.getColor();
             } else {
-                logger.warn("Color là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("Color là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getRam() != null) {
                 this.productRam = item.getRam();
             } else {
-                logger.warn("Ram là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("Ram là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getInchs() != null) {
                 this.Inchs = item.getInchs();
             } else {
-                logger.warn("Inchs là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("Inchs là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getProducttype() != null) {
                 this.productType = item.getProducttype().toString();
             } else {
-                logger.warn("ProductType là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("ProductType là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getTariffiPackage() != null) {
                 this.tafiffPakageName = item.getTariffiPackage().getPackageName();
             } else {
-                logger.warn("TariffiPackage là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("TariffiPackage là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getHardDriveType() != null) {
                 this.configurationHardDrive = item.getHardDriveType();
             } else {
-                logger.warn("ConfigurationHardDrive là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("ConfigurationHardDrive là null cho ProductItem có ID: {}", item.getProductItemId());
             }
 
             if (item.getInternalmemory() != null) {
                 this.internalMemory = item.getInternalmemory();
             } else {
-                logger.warn("InternalMemory là null cho ProductItem có ID: {}", item.getProductItemID());
+                logger.warn("InternalMemory là null cho ProductItem có ID: {}", item.getProductItemId());
+            }
+
+            if(item.getDescriptedID() != null) {
+                this.descripted = item.getDescriptedID().getDescripted();
+            } else{
+                logger.warn("Loi khi lay descipted tai san pham " + item.getProductItemId());
             }
 
         } catch (Exception e) {
@@ -102,19 +106,10 @@ public class ProductItemDTO {
         }
     }
 
-    public ProductItemDTO() {}
 
     // Getters
-    public Integer getProductitemId() {
-        return productitemId;
-    }
-
-    public Integer getClientId() {
-        return clientId;
-    }
-
-    public Integer getSellCategoryId() {
-        return sellCategoryId;
+    public String getClientPhoneNumber() {
+        return clientPhoneNumber;
     }
 
     public String getColorName() {
@@ -149,33 +144,26 @@ public class ProductItemDTO {
         return tafiffPakageName;
     }
 
-    public String getDescriptedProduct() {
-        return descriptedProduct;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public Integer getPrice() {
-        return price;
-    }
-
-    public Integer getWarranPeriod() {
-        return warranPeriod;
+    public String getNormalDescribe() {
+        return normalDescribe;
     }
 
     public String getVersion() {
         return version;
     }
 
-    public String getProductName() {
-        return productName;
+    public void setNormalDescribe(String normalDescribe) {
+        this.normalDescribe = normalDescribe;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public void setColorName(String colorName) {
         this.colorName = colorName;
     }
+
 
     public void setConfigurationHardDrive(String configurationHardDrive) {
         this.configurationHardDrive = configurationHardDrive;
@@ -205,27 +193,11 @@ public class ProductItemDTO {
         this.tafiffPakageName = tafiffPakageName;
     }
 
-    public void setDescriptedProduct(String descriptedProduct) {
-        this.descriptedProduct = descriptedProduct;
+    public String getDescripted() {
+        return descripted;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public void setPrice(Integer price) {
-        this.price = price;
-    }
-
-    public void setWarranPeriod(Integer warranPeriod) {
-        this.warranPeriod = warranPeriod;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setDescripted(String descripted) {
+        this.descripted = descripted;
     }
 }
