@@ -21,6 +21,9 @@ public class ProductItem {
     @JoinColumn(name = "clientid")
     private AbClient abclient;
 
+    @Column(name = "price")
+    private Double price;
+
     @Column(name = "Color")
     private String Color;
 
@@ -64,6 +67,14 @@ public class ProductItem {
 
     // Getters & Setters
 
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
     public AbClient getAbclient() {
         return abclient;
