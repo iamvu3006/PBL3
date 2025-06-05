@@ -8,14 +8,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.pbl3.ecommerce.entity.ProductItem;
+
 @Repository
-public interface ProductItemRepository 
-        extends JpaRepository<ProductItem, Long > {
+public interface ProductItemRepository extends JpaRepository<ProductItem, Integer> {
 
     @Query("""
       SELECT p 
       FROM ProductItem p
-      JOIN p.descripteds d
+      JOIN p.descripted d
       WHERE LOWER(d.productName) LIKE LOWER(CONCAT('%', :keyword, '%'))
     """)
     List<ProductItem> searchByProductName(@Param("keyword") String keyword);

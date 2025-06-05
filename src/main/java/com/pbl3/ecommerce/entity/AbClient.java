@@ -27,7 +27,7 @@ public class AbClient {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<ProductCategoryClient> productCategoryClients = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(cascade = CascadeType.ALL, optional = true)
     @JoinColumn(name = "wishlistid")
     private WishListCategory wishListCategory;
 

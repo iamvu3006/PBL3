@@ -5,6 +5,7 @@ import com.pbl3.ecommerce.dto.ClientDTO;
 import com.pbl3.ecommerce.dto.LoginRequest;
 import com.pbl3.ecommerce.dto.RegisterRequest;
 import com.pbl3.ecommerce.entity.AbClient;
+import com.pbl3.ecommerce.entity.WishListCategory;
 import com.pbl3.ecommerce.repository.AbClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -60,6 +61,9 @@ public class AuthService {
                 return new AuthResponse(false, "Số điện thoại đã được sử dụng");
             }
 
+            // Tạo WishListCategory mặc định trước
+            WishListCategory defaultWishList = new WishListCategory();
+
             // Tạo client mới
             AbClient newClient = new AbClient();
             newClient.setClientUseName(registerRequest.getUsername());
@@ -69,8 +73,12 @@ public class AuthService {
             newClient.setClientEmailAdress(registerRequest.getEmail());
             newClient.setClientAdress(registerRequest.getAddress());
 
-            // Lưu client vào database
+            // Set wishlist cho client (sử dụng setter custom của bạn)
+            newClient.setWishListCategory(defaultWishList);
+
+            // Lưu client vào database (cascade sẽ tự động lưu wishlist)
             AbClient savedClient = clientRepository.save(newClient);
+
             return new AuthResponse(true, "Đăng ký thành công", savedClient.getClientID(), savedClient.getClientUseName());
         } catch (Exception e) {
             e.printStackTrace();

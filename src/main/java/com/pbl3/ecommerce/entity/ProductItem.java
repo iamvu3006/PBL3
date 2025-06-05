@@ -64,9 +64,16 @@ public class ProductItem {
 
     // Getters & Setters
 
-
     public AbClient getAbclient() {
         return abclient;
+    }
+
+    public void setAbclient(AbClient abclient) {
+        this.abclient = abclient;
+    }
+
+    public void setAbClient(AbClient abClient) {
+        this.abclient = abClient;
     }
 
     public Integer getInternalMemory() {
@@ -75,6 +82,10 @@ public class ProductItem {
 
     public AbVersion getVersion() {
         return version;
+    }
+
+    public void setVersion(AbVersion version) {
+        this.version = version;
     }
 
     public Brand getBrandid() {
@@ -138,7 +149,6 @@ public class ProductItem {
     }
 
     public Descripted getDescriptedID() {
-
         return descripted;
     }
 
@@ -153,6 +163,7 @@ public class ProductItem {
     public enum ProductType{
         LAPTOP, PHONE
     }
+
     public Integer getProductItemId() {
         return productItemId;
     }
@@ -165,6 +176,10 @@ public class ProductItem {
         return TariffiPackage;
     }
 
+    // *** SETTER MỚI - Thêm setter cho TariffiPackage ***
+    public void setTariffiPackage(TariffiPackage tariffiPackage) {
+        this.TariffiPackage = tariffiPackage;
+    }
 
     public SellCategory getSellCategory() {
         return SellCategory;
@@ -185,5 +200,4 @@ public class ProductItem {
     public void setHardDriveType(String hardDriveType) {
         HardDriveType = hardDriveType;
     }
-
 }
