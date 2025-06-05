@@ -54,4 +54,20 @@ public class ListProductItemController {
 
         return new ResponseEntity<>(productItemDetail,HttpStatus.OK);
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<ListProductItemDTO>> filterProducts(
+            @RequestParam(required = false) String brandName,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice) {
+
+        List<ListProductItemDTO> filteredProducts = listProductService.filterProducts(brandName, minPrice, maxPrice);
+
+        if (filteredProducts.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(filteredProducts, HttpStatus.OK);
+    }
+
 }
