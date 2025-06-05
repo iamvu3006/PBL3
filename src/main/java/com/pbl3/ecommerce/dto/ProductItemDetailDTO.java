@@ -8,6 +8,7 @@ public class ProductItemDetailDTO {
     private static final Logger logger = LoggerFactory.getLogger(ProductItemDetailDTO.class);
 
     private String clientPhoneNumber;
+    private Double price;
     private String descripted;
     private String colorName;
     private String configurationHardDrive;
@@ -31,6 +32,11 @@ public class ProductItemDetailDTO {
                 logger.warn("Co loi khi lay so dien thoai tai san pham: {}", item.getProductItemId());
             }
 
+            if(item.getPrice() == 0){
+                this.price = item.getPrice();
+            } else{
+                logger.warn("Co loi khi truy xuat gia tai san pham co id: {}", item.getProductItemId());
+            }
             if(item.getVersion().getVersionName() != null){
                 this.version = item.getVersion().getVersionName();
             } else{
@@ -93,6 +99,10 @@ public class ProductItemDetailDTO {
 
 
     // Getters
+
+    public Double getPrice() {
+        return price;
+    }
 
     public String getVersion() {
         return version;

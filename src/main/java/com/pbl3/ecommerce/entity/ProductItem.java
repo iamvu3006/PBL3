@@ -21,6 +21,9 @@ public class ProductItem {
     @JoinColumn(name = "clientid")
     private AbClient abclient;
 
+    @Column(name = "price")
+    private Double price;
+
     @Column(name = "Color")
     private String Color;
 
@@ -63,6 +66,15 @@ public class ProductItem {
     private List<ProductItemCategory> productItemCategories = new ArrayList<>();
 
     // Getters & Setters
+
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
     public AbClient getAbclient() {
         return abclient;
@@ -149,6 +161,7 @@ public class ProductItem {
     }
 
     public Descripted getDescriptedID() {
+
         return descripted;
     }
 
@@ -176,7 +189,6 @@ public class ProductItem {
         return TariffiPackage;
     }
 
-    // *** SETTER MỚI - Thêm setter cho TariffiPackage ***
     public void setTariffiPackage(TariffiPackage tariffiPackage) {
         this.TariffiPackage = tariffiPackage;
     }
@@ -200,4 +212,5 @@ public class ProductItem {
     public void setHardDriveType(String hardDriveType) {
         HardDriveType = hardDriveType;
     }
+
 }

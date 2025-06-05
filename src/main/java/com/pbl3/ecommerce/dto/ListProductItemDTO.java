@@ -10,12 +10,17 @@ public class ListProductItemDTO {
     private String brandName;
     private String version;
     private String normalDescribe;
+    private Double price;
 
     public ListProductItemDTO(ProductItem item) {
         try {
             if(item != null) {
                 if(item.getBrand().getVersions() != null) {
                     this.version = item.getBrand().getVersions().getFirst().getVersionName();
+                }
+
+                if(item.getPrice() != 0){
+                    this.price = item.getPrice();
                 }
 
                 if (item.getBrand() != null) {
@@ -64,5 +69,9 @@ public class ListProductItemDTO {
 
     public String getVersion() {
         return version;
+    }
+
+    public Double getPrice() {
+        return price;
     }
 }

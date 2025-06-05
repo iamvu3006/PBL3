@@ -65,4 +65,16 @@ public class ListProductService {
         }
         return new ProductItemDetailDTO(item);
     }
+
+    public List<ListProductItemDTO> filterProducts(String brandName, Double minPrice, Double maxPrice) {
+        List<ProductItem> items = listProductItemRepository.filterProducts(brandName, minPrice, maxPrice);
+        List<ListProductItemDTO> result = new ArrayList<>();
+
+        for (ProductItem item : items) {
+            result.add(new ListProductItemDTO(item));
+        }
+
+        return result;
+    }
+
 }
