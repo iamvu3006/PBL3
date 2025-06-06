@@ -193,19 +193,14 @@
                 <div class="error-message" id="productNameError"></div>
             </div>
 
-            <!-- Thay thế phần danh mục cũ bằng đoạn code này -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="productCategoryId">Danh mục sản phẩm *</label>
-                    <select class="form-control" id="productCategoryId" name="productCategoryId" required>
-                        <option value="">Chọn danh mục</option>
-                        <option th:if="${productCategories != null}"
-                                th:each="category : ${productCategories}"
-                                th:value="${category.productCategoryID}"
-                                th:text="${category.productCategoryName}">
-                        </option>
+                    <label for="productType">Loại sản phẩm</label>
+                    <select class="form-control" id="productType" name="productType" required>
+                        <option value="">Chọn loại sản phẩm</option>
+                        <option value="LAPTOP">Laptop</option>
+                        <option value="PHONE">Điện thoại</option>
                     </select>
-                <div class="error-message" id="productCategoryIdError"></div>
                 </div>
 
                 <div class="form-group">
@@ -368,77 +363,18 @@
 <script>
 document.getElementById('createProductForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
-    // Validate required fields
-    const requiredFields = ['productType', 'productCategoryId', 'productName'];  // Thay đổi từ sellCategoryId thành productCategoryId
-    for (const fieldId of requiredFields) {
-        const field = document.getElementById(fieldId);
-        if (!field || !field.value.trim()) {
-            alert(`Vui lòng điền đầy đủ thông tin ${fieldId}`);
-            return;
-        }
-    }
-    
+
     const loadingIndicator = document.getElementById('loadingIndicator');
     const form = this;
     
-    
     loadingIndicator.style.display = 'block';
     form.style.display = 'none';
-
-    try {
-        const formData = new FormData(form);
-        const data = {};
-        
-        formData.forEach((value, key) => {
-            // Xử lý các trường đặc biệt
-            if (key === 'clientId' || key === 'productRam' || 
-                key === 'internalMemory' || key === 'warranPeriod' || 
-                key === 'productCategoryId') {  // Thay đổi từ sellCategoryId thành productCategoryId
-            data[key] = parseInt(value, 10);
-        } else if (key === 'price') {
-                data[key] = parseFloat(value.replace(/\./g, ''));
-            } else if (key === 'productType') {
-                // Đảm bảo productType không null
-                data[key] = value.trim();
-            } else {
-                data[key] = value;
-            }
-        });
-
-        // Log data trước khi gửi để debug
-        console.log('Sending data:', data);
-
-        const response = await fetch('/api/products/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText);
-        }
-
-        const result = await response.text();
-        alert(result);
-        window.location.href = '/products';
-        
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Có lỗi xảy ra: ' + error.message);
-    } finally {
-        loadingIndicator.style.display = 'none';
-        form.style.display = 'block';
-    }
 });
 
 // Xử lý các select boxes tùy chỉnh
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Xử lý version select khi brand thay đổi
-    document.getElementById('brandName').addEventListener('change', function() {
+    document.getElementById('brandName').addEventListener('change', function () {
         const brandName = this.value;
         if (brandName) {
             fetch(`/api/brands/${encodeURIComponent(brandName)}/versions`)
@@ -469,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const select = document.getElementById(selectId);
         const input = document.getElementById(inputId);
         if (select && input) {
-            select.addEventListener('change', function() {
+            select.addEventListener('change', function () {
                 input.style.display = this.value === 'Khác' ? 'block' : 'none';
                 input.required = this.value === 'Khác';
             });
