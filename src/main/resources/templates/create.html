@@ -83,6 +83,10 @@
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
 
+        .form-control.error {
+            border-color: var(--accent-color);
+        }
+
         select.form-control {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -113,6 +117,11 @@
             background-color: #2980b9;
         }
 
+        .btn-primary:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
         .btn-block {
             width: 100%;
         }
@@ -124,10 +133,38 @@
             display: none;
         }
 
+        .success-message {
+            color: var(--success-color);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading i {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mt-2 {
+            margin-top: 8px;
         }
 
         @media (max-width: 768px) {
@@ -141,50 +178,66 @@
 <div class="container">
     <div class="form-container">
         <h1 class="form-title">Đăng Tin Bán Sản Phẩm</h1>
+
+        <div class="loading" id="loadingIndicator">
+            <i class="fas fa-spinner"></i>
+            <p>Đang xử lý...</p>
+        </div>
+
         <form id="createProductForm" th:action="@{/api/products/create}" method="POST">
             <input type="hidden" name="clientId" th:value="${clientId}">
 
-            <!-- Các trường đã được giữ nguyên -->
             <div class="form-group">
-                <label for="productName">Tên sản phẩm</label>
+                <label for="productName">Tên sản phẩm *</label>
                 <input type="text" class="form-control" id="productName" name="productName" required>
+                <div class="error-message" id="productNameError"></div>
             </div>
 
+            <!-- Thay thế phần danh mục cũ bằng đoạn code này -->
             <div class="form-row">
                 <div class="form-group">
-                    <label for="productType">Loại sản phẩm</label>
-                    <select class="form-control" id="productType" name="productType" required>
-                        <option value="">Chọn loại sản phẩm</option>
-                        <option value="LAPTOP">Laptop</option>
-                        <option value="PHONE">Điện thoại</option>
+                    <label for="productCategoryId">Danh mục sản phẩm *</label>
+                    <select class="form-control" id="productCategoryId" name="productCategoryId" required>
+                        <option value="">Chọn danh mục</option>
+                        <option th:if="${productCategories != null}"
+                                th:each="category : ${productCategories}"
+                                th:value="${category.productCategoryID}"
+                                th:text="${category.productCategoryName}">
+                        </option>
                     </select>
+                <div class="error-message" id="productCategoryIdError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="brandName">Thương hiệu</label>
-                    <select class="form-control" id="brandName" name="brandName" required onchange="loadVersions()">
+                    <label for="brandName">Thương hiệu *</label>
+                    <select class="form-control" id="brandName" name="brandName" required>
                         <option value="">Chọn thương hiệu</option>
                         <option th:each="brand : ${brands}"
                                 th:value="${brand.brandName}"
                                 th:text="${brand.brandName}">
                         </option>
                     </select>
+                    <div class="error-message" id="brandNameError"></div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="version">Phiên bản</label>
-                    <select class="form-control" id="version" name="version" onchange="handleVersionChange()" required>
+                    <label for="version">Phiên bản *</label>
+                    <select class="form-control" id="version" name="version" required>
                         <option value="">Chọn phiên bản</option>
+                        <th:block th:each="ver : ${versions}">
+                            <option th:value="${ver.versionid}" th:text="${ver.version_name}"></option>
+                        </th:block>
                         <option value="Khác">Khác</option>
                     </select>
                     <input type="text" class="form-control mt-2" id="customVersion" name="customVersion" placeholder="Nhập phiên bản khác" style="display:none;" />
+                    <div class="error-message" id="versionError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="colorName">Màu sắc</label>
-                    <select class="form-control" id="colorSelect" name="colorSelect" onchange="handleColorChange(this)">
+                    <label for="colorName">Màu sắc *</label>
+                    <select class="form-control" id="colorSelect" name="colorSelect">
                         <option value="">Chọn màu</option>
                         <option value="Đen">Đen</option>
                         <option value="Trắng">Trắng</option>
@@ -198,13 +251,14 @@
                         <option value="Khác">Khác</option>
                     </select>
                     <input type="text" class="form-control mt-2" id="colorName" name="colorName" placeholder="Nhập màu khác" style="display:none;" />
+                    <div class="error-message" id="colorNameError"></div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="productRam">RAM (GB)</label>
-                    <select class="form-control" id="productRam" name="productRam" onchange="toggleCustomRamInput()" required>
+                    <label for="productRam">RAM (GB) *</label>
+                    <select class="form-control" id="productRam" name="productRam" required>
                         <option value="">Chọn RAM</option>
                         <option value="1">1 GB</option>
                         <option value="2">2 GB</option>
@@ -216,10 +270,11 @@
                         <option value="Khác">Khác</option>
                     </select>
                     <input type="number" class="form-control mt-2" id="customRamInput" name="customRamInput" placeholder="Nhập RAM khác (GB)" style="display: none;" />
+                    <div class="error-message" id="productRamError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="internalMemory">Bộ nhớ trong (ROM)</label>
+                    <label for="internalMemory">Bộ nhớ trong (ROM) *</label>
                     <select class="form-control" id="internalMemory" name="internalMemory" required>
                         <option value="">Chọn dung lượng</option>
                         <option value="128">128 GB</option>
@@ -229,23 +284,26 @@
                         <option value="Khác">Khác</option>
                     </select>
                     <input type="text" class="form-control mt-2" id="customRom" name="customRom" placeholder="Nhập dung lượng khác" style="display:none;" />
+                    <div class="error-message" id="internalMemoryError"></div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="configurationHardDrive">Loại ổ cứng</label>
+                    <label for="configurationHardDrive">Loại ổ cứng *</label>
                     <select class="form-control" id="configurationHardDrive" name="configurationHardDrive" required>
                         <option value="">Chọn loại ổ cứng</option>
                         <option value="SSD">SSD</option>
                         <option value="HDD">HDD</option>
                         <option value="SSHD">SSHD</option>
+                        <option value="Khác">Khác</option>
                     </select>
                     <input type="text" class="form-control mt-2" id="customHDD" name="customHDD" placeholder="Nhập loại ổ cứng khác" style="display:none;" />
+                    <div class="error-message" id="configurationHardDriveError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="inchs">Kích thước màn hình</label>
+                    <label for="inchs">Kích thước màn hình *</label>
                     <select class="form-control" id="inchs" name="inchs" required>
                         <option value="">Chọn kích thước</option>
                         <option value="5.5">5.5 inch</option>
@@ -258,165 +316,166 @@
                         <option value="Khác">Khác</option>
                     </select>
                     <input type="text" class="form-control mt-2" id="customScreen" name="customScreen" placeholder="Nhập kích thước khác" style="display:none;" />
+                    <div class="error-message" id="inchsError"></div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="descriptedProduct">Mô tả sản phẩm</label>
+                <label for="descriptedProduct">Mô tả sản phẩm *</label>
                 <textarea class="form-control" id="descriptedProduct" name="descriptedProduct" rows="4" required></textarea>
+                <div class="error-message" id="descriptedProductError"></div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
-                    <label for="price">Giá (VND)</label>
-                    <input type="text" class="form-control" id="price" name="price" required oninput="formatPrice(this)">
+                    <label for="price">Giá (VND) *</label>
+                    <input type="text" class="form-control" id="price" name="price" required>
+                    <div class="error-message" id="priceError"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="warranPeriod">Thời gian bảo hành (tháng)</label>
-                    <input type="number" class="form-control" id="warranPeriod" name="warranPeriod" required>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="sellCategoryId">Danh mục</label>
-                    <select class="form-control" id="sellCategoryId" name="sellCategoryId" required>
-                        <option value="">Chọn danh mục</option>
-                        <option th:each="category : ${categories}"
-                                th:value="${category.id}"
-                                th:text="${category.name}">
-                        </option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="tafiffPakageName">Gói cước</label>
-                    <select class="form-control" id="tafiffPakageName" name="tafiffPakageName" required>
-                        <option value="">Chọn gói cước</option>
-                        <option th:each="tariff : ${tariffs}"
-                                th:value="${tariff.packageName}"
-                                th:text="${tariff.packageName}">
-                        </option>
-                    </select>
+                    <label for="warranPeriod">Thời gian bảo hành (tháng) *</label>
+                    <input type="number" class="form-control" id="warranPeriod" name="warranPeriod" required min="0">
+                    <div class="error-message" id="warranPeriodError"></div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="address">Địa chỉ</label>
-                <input type="text" class="form-control" id="address" name="address" required>
+                <label for="tafiffPakageName">Gói cước *</label>
+                <select class="form-control" id="tafiffPakageName" name="tafiffPakageName" required>
+                    <option value="">Chọn gói cước</option>
+                    <option th:each="tariff : ${tariffs}"
+                            th:value="${tariff.packageName}"
+                            th:text="${tariff.packageName}">
+                    </option>
+                </select>
+                <div class="error-message" id="tafiffPakageNameError"></div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Đăng tin</button>
+            <div class="form-group">
+                <label for="address">Địa chỉ *</label>
+                <input type="text" class="form-control" id="address" name="address" required>
+                <div class="error-message" id="addressError"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                <i class="fas fa-paper-plane"></i> Đăng tin
+            </button>
         </form>
     </div>
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const brandSelect = document.getElementById('brandName');
-        const versionSelect = document.getElementById('version');
+document.getElementById('createProductForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Validate required fields
+    const requiredFields = ['productType', 'productCategoryId', 'productName'];  // Thay đổi từ sellCategoryId thành productCategoryId
+    for (const fieldId of requiredFields) {
+        const field = document.getElementById(fieldId);
+        if (!field || !field.value.trim()) {
+            alert(`Vui lòng điền đầy đủ thông tin ${fieldId}`);
+            return;
+        }
+    }
+    
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const form = this;
+    
+    
+    loadingIndicator.style.display = 'block';
+    form.style.display = 'none';
 
-        // Xử lý khi chọn thương hiệu
-        brandSelect.addEventListener('change', function() {
-            const selectedBrand = this.value;
-            if (selectedBrand) {
-                // Gọi API để lấy danh sách phiên bản của thương hiệu
-                fetch(`/api/brands/${selectedBrand}/versions`)
-                    .then(response => response.json())
-                    .then(versions => {
-                        versionSelect.innerHTML = '<option value="">Chọn phiên bản</option>';
-                        versions.forEach(version => {
-                            const option = document.createElement('option');
-                            option.value = version.versionName;
-                            option.textContent = version.versionName;
-                            versionSelect.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Error:', error));
+    try {
+        const formData = new FormData(form);
+        const data = {};
+        
+        formData.forEach((value, key) => {
+            // Xử lý các trường đặc biệt
+            if (key === 'clientId' || key === 'productRam' || 
+                key === 'internalMemory' || key === 'warranPeriod' || 
+                key === 'productCategoryId') {  // Thay đổi từ sellCategoryId thành productCategoryId
+            data[key] = parseInt(value, 10);
+        } else if (key === 'price') {
+                data[key] = parseFloat(value.replace(/\./g, ''));
+            } else if (key === 'productType') {
+                // Đảm bảo productType không null
+                data[key] = value.trim();
             } else {
-                versionSelect.innerHTML = '<option value="">Chọn phiên bản</option>';
+                data[key] = value;
             }
         });
 
-        // Xử lý submit form
-        document.getElementById('createProductForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Log data trước khi gửi để debug
+        console.log('Sending data:', data);
 
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-
-            fetch(this.action, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.text())
-                .then(result => {
-                    alert(result);
-                    if (result.includes('thành công')) {
-                        window.location.href = '/';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi đăng tin. Vui lòng thử lại!');
-                });
+        const response = await fetch('/api/products/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        const result = await response.text();
+        alert(result);
+        window.location.href = '/products';
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra: ' + error.message);
+    } finally {
+        loadingIndicator.style.display = 'none';
+        form.style.display = 'block';
+    }
+});
+
+// Xử lý các select boxes tùy chỉnh
+document.addEventListener('DOMContentLoaded', function() {
+    // Xử lý version select khi brand thay đổi
+    document.getElementById('brandName').addEventListener('change', function() {
+        const brandName = this.value;
+        if (brandName) {
+            fetch(`/api/brands/${encodeURIComponent(brandName)}/versions`)
+                .then(response => response.json())
+                .then(versions => {
+                    const versionSelect = document.getElementById('version');
+                    versionSelect.innerHTML = '<option value="">Chọn phiên bản</option>';
+                    versions.forEach(version => {
+                        const option = document.createElement('option');
+                        option.value = version.versionName;
+                        option.textContent = version.versionName;
+                        versionSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading versions:', error));
+        }
     });
-    function toggleInput(selectId, inputId) {
+
+    // Xử lý hiển thị input tùy chỉnh
+    const customInputPairs = [
+        ['version', 'customVersion'],
+        ['colorSelect', 'colorName'],
+        ['productRam', 'customRamInput'],
+        ['internalMemory', 'customRom']
+    ];
+
+    customInputPairs.forEach(([selectId, inputId]) => {
         const select = document.getElementById(selectId);
         const input = document.getElementById(inputId);
-        if (select.value === 'Khác') {
-            input.style.display = 'block';
-            input.required = true;
-        } else {
-            input.style.display = 'none';
-            input.required = false;
+        if (select && input) {
+            select.addEventListener('change', function() {
+                input.style.display = this.value === 'Khác' ? 'block' : 'none';
+                input.required = this.value === 'Khác';
+            });
         }
-    }
-
-    function handleRamChange() {
-        toggleInput('productRam', 'customRam');
-    }
-
-    function handleRomChange() {
-        toggleInput('internalMemory', 'customRom');
-    }
-
-    function handleHDDChange() {
-        toggleInput('configurationHardDrive', 'customHDD');
-    }
-
-    function handleScreenChange() {
-        toggleInput('inchs', 'customScreen');
-    }
-
-    function handleVersionChange() {
-        toggleInput('version', 'customVersion');
-    }
-
-    function handleColorChange(select) {
-        const colorInput = document.getElementById('colorName');
-        if (select.value === 'Khác') {
-            colorInput.style.display = 'block';
-            colorInput.required = true;
-        } else {
-            colorInput.style.display = 'none';
-            colorInput.required = false;
-        }
-    }
-    // Format giá tiền có dấu chấm ngăn cách
-    function formatPrice(input) {
-        let raw = input.value.replace(/\./g, '').replace(/[^0-9]/g, '');
-        if (!raw) {
-            input.value = '';
-            return;
-        }
-        input.value = parseInt(raw).toLocaleString('vi-VN');
-    }
+    });
+});
 </script>
 </body>
 </html>
