@@ -1,17 +1,15 @@
 package com.pbl3.ecommerce.service;
 
 import com.pbl3.ecommerce.dto.PushProductItemDTO;
-import com.pbl3.ecommerce.dto.ProductItemDTO;
 import com.pbl3.ecommerce.entity.*;
 import com.pbl3.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class PushProductItemService {
@@ -21,7 +19,6 @@ public class PushProductItemService {
     private final BrandRepository brandRepository;
     private final TariffiPackageRepository tariffiPackageRepository;
     private final SellCategoryRepository sellCategoryRepository;
-    private final ProductItemSellRepository productItemSellRepository;
 
     @Autowired
     public PushProductItemService(
@@ -29,14 +26,12 @@ public class PushProductItemService {
             AbClientRepository clientRepository,
             BrandRepository brandRepository,
             TariffiPackageRepository tariffiPackageRepository,
-            SellCategoryRepository sellCategoryRepository,
-            ProductItemSellRepository productItemSellRepository) {
+            SellCategoryRepository sellCategoryRepository) {
         this.productItemRepository = productItemRepository;
         this.clientRepository = clientRepository;
         this.brandRepository = brandRepository;
         this.tariffiPackageRepository = tariffiPackageRepository;
         this.sellCategoryRepository = sellCategoryRepository;
-        this.productItemSellRepository = productItemSellRepository;
     }
 
     @Transactional
@@ -44,7 +39,15 @@ public class PushProductItemService {
         // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName(); // Lấy tên đăng nhập
+
+        AbClient client = clientRepository.findByClientUseName(username)
+                .orElseThrow(() -> new Exception("Không tìm thấy client với username: " + username));
+        item.setAbclient(client);
+
         // Set basic properties
+
         item.setColor(dto.getColorName());
         item.setRam(dto.getProductRam());
         item.setInchs(dto.getInchs());
@@ -65,11 +68,6 @@ public class PushProductItemService {
             System.out.println("Loại sản phẩm phải là: LAPTOP hoặc PHONE.");
             throw e;
         }
-
-        // Set client relationship with proper error handling
-        AbClient client = clientRepository.findById(dto.getClientId())
-                .orElseThrow(() -> new Exception("Khong tim thay id khach hang: " + dto.getClientId()));
-        item.setAbClient(client);
 
         // Set brand relationship with proper error handling
         Brand brand = brandRepository.findByBrandName(dto.getBrandName());
@@ -96,7 +94,6 @@ public class PushProductItemService {
         if (tp == null) {
             throw new Exception("khong tim thay goi cuoc: " + dto.getTafiffPakageName() + "tai id khach hang la" + item.getAbClient().getClientID());
         }
-        item.setTariffiPackage(tp);
 
         // Set sell category relationship with proper error handling
         SellCategory sc = sellCategoryRepository.findById(dto.getSellCategoryId())
@@ -117,16 +114,5 @@ public class PushProductItemService {
         // Save the product item (Descripted will be saved via cascade)
         return productItemRepository.save(item);
     }
-
-    public List<ProductItemDTO> ListProductBySellID(Integer clientID) {
-        List<ProductItem> items = productItemSellRepository.findBySellCategoryIDNative(clientID);
-
-        List<ProductItemDTO> itemDTOList = new ArrayList<>();
-
-        for (ProductItem item : items) {
-            ProductItemDTO productItemDTO = new ProductItemDTO(item);
-            itemDTOList.add(productItemDTO);
-        }
-        return itemDTOList;
-    }
 }
+
