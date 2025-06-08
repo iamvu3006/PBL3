@@ -442,6 +442,71 @@
                 font-size: 1.5rem;
             }
         }
+        .user-nav {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+/* 2. Ẩn menu mặc định */
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;    /* ngay dưới toggle */
+  right: 0;     /* canh phải cho dropdown */
+  background: #fff;
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 4px;
+  padding: 8px 0;
+  z-index: 1000;
+}
+
+/* 3. Hiệu ứng khi hover vào cả toggle hoặc menu */
+.user-nav:hover .dropdown-menu {
+  display: block;
+}
+
+/* 4. Các mục trong menu */
+.dropdown-item {
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  color: #333;
+  text-decoration: none;
+}
+.dropdown-item i {
+  margin-right: 8px;
+}
+.dropdown-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* 5. Tiêu đề nhóm */
+.dropdown-header {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  color: #777;
+  text-transform: uppercase;
+}
+
+/* 6. Gạch ngăn cách */
+.dropdown-menu hr {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* 7. Icon mũi tên nhỏ */
+.small-icon {
+  font-size: 0.8rem;
+  margin-left: 4px;
+}
     </style>
 </head>
 <body>
@@ -453,27 +518,58 @@
         </a>
 
         <div class="nav-container">
-            <div class="user-nav">
-                <!-- Chỉ những link này mới require-login -->
-                <a th:href="@{/cart}" class="nav-link require-login">
-                    <i class="fas fa-shopping-cart"></i> Giỏ Hàng
-                </a>
-                <a th:href="@{/api/products/create}" class="nav-link require-login ">
-                    <i class="fas fa-plus-circle"></i> Đăng Tin
-                </a>
-                <a href="#" id="logout-link" class="nav-link" style="display:none;">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                </a>
-                <span id="user-info"></span>
-                <!-- Login / Register với ID riêng -->
-                <a th:href="@{/login}" id="login-link" class="nav-link">
-                    <i class="fas fa-sign-in-alt"></i> Đăng Nhập
-                </a>
-                <a th:href="@{/register}" id="register-link" class="nav-link">
-                    <i class="fas fa-user-plus"></i> Đăng Ký
-                </a>
-            </div>
+            <div class="user-nav dropdown">
+        <!-- Nút chính luôn hiện -->
+        <a href="#" class="nav-link dropdown-toggle" id="account-toggle">
+          <i class="fas fa-user-circle"></i> Tài khoản
+          <i class="fas fa-chevron-down small-icon"></i>
+        </a>
+        <!-- Dropdown-content ban đầu ẩn -->
+        <div class="dropdown-menu">
+          <!-- Ví dụ nhóm thông tin -->
+          <div class="dropdown-header">
+            <strong>Đăng nhập / Đăng ký</strong>
+          </div>
+          <a href="/login" class="dropdown-item">
+            <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+          </a>
+          <a href="/register" class="dropdown-item">
+            <i class="fas fa-user-plus"></i> Đăng Ký
+          </a>
+          <hr>
+          <!-- Ví dụ nhóm chức năng -->
+          <div class="dropdown-header">
+            <strong>Quản lí đơn hàng</strong>
+          </div>
+          <a href="/orders/buy" class="dropdown-item">
+            <i class="fas fa-shopping-bag"></i> Đơn mua
+          </a>
+          <a href="/orders/sell" class="dropdown-item">
+            <i class="fas fa-box-open"></i> Đơn bán
+          </a>
+          <hr>
+          <!-- Tiếp tục thêm các mục khác tương tự -->
+          <div class="dropdown-header"><strong>Tiện ích</strong></div>
+          <a href="/saved/posts" class="dropdown-item">
+            <i class="fas fa-heart"></i> Tin đăng đã lưu
+          </a>
+          <a href="/saved/search" class="dropdown-item">
+            <i class="fas fa-bookmark"></i> Tìm kiếm đã lưu
+          </a>
+          <!-- …chèn nốt những item bạn cần… -->
         </div>
+      </div>
+      <!-- Các nút khác: Giỏ hàng, Đăng Tin, Đăng xuất… -->
+      <a th:href="@{/cart}" class="nav-link require-login">
+        <i class="fas fa-shopping-cart"></i> Giỏ Hàng
+      </a>
+      <a th:href="@{/api/products/create}" class="nav-link require-login">
+        <i class="fas fa-plus-circle"></i> Đăng Tin
+      </a>
+      <a href="#" id="logout-link" class="nav-link" style="display:none;">
+        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+      </a>
+       </div>
     </div>
 
     <div class="container">
