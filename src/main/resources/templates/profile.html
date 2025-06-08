@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Client Profile</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; }
+    label { display: block; margin-top: 1rem; }
+    input, button { padding: 0.5rem; font-size: 1rem; width: 100%; box-sizing: border-box; }
+    button { margin-top: 1.5rem; }
+    .message { margin-top: 1rem; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" th:href="@{/css/common.css}">
+</head>
+<body>
+
+  <h1>Hồ sơ khách hàng</h1>
+
+  <form id="profileForm">
+    <label>
+      ID:
+      <input type="text" id="clientId" name="id" readonly>
+    </label>
+    <label>
+      Họ tên:
+      <input type="text" id="fullName" name="fullName" required>
+    </label>
+    <label>
+      Email:
+      <input type="email" id="email" name="email" required>
+    </label>
+    <label>
+      Số điện thoại:
+      <input type="tel" id="phone" name="phone">
+    </label>
+    <label>
+      Mật khẩu mới:
+      <input type="password" id="password" name="password">
+      <small>(để trống nếu không đổi)</small>
+    </label>
+    <button type="submit">Cập nhật</button>
+  </form>
+
+  <div class="message" id="message"></div>
+
+  <script>
+    (function() {
+      // Lấy id từ URL: giả sử URL dạng .../client/{id}/profile.html
+      const path = window.location.pathname.split('/');
+      // tìm segment chứa 'client'
+      const idx = path.indexOf('client');
+      if (idx < 0 || idx + 1 >= path.length) {
+        document.getElementById('message').textContent = 'Không xác định được client ID từ đường dẫn.';
+        return;
+      }
+      const clientId = path[idx + 1];
+      const apiBase = `/client/${clientId}/profile`;
+
+      const form = document.getElementById('profileForm');
+      const msgEl = document.getElementById('message');
+
+      // 1) GET profile
+      fetch(apiBase)
+        .then(res => {
+          if (!res.ok) throw new Error('Lỗi khi lấy dữ liệu: ' + res.status);
+          return res.json();
+        })
+        .then(dto => {
+          document.getElementById('clientId').value = dto.id || '';
+          document.getElementById('fullName').value = dto.fullName || '';
+          document.getElementById('email').value    = dto.email || '';
+          document.getElementById('phone').value    = dto.phone || '';
+        })
+        .catch(err => {
+          msgEl.textContent = err;
+          msgEl.style.color = 'red';
+        });
+
+      // 2) PUT update profile
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        msgEl.textContent = '';
+
+        const payload = {
+          // không gửi id lại nếu service không cần, hoặc include nếu DTO có
+          fullName: document.getElementById('fullName').value,
+          email:    document.getElementById('email').value,
+          phone:    document.getElementById('phone').value,
+        };
+        const pwd = document.getElementById('password').value;
+        if (pwd) payload.password = pwd;
+
+        fetch(apiBase, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        .then(res => {
+          if (res.ok) return res.text();
+          return res.text().then(txt => { throw new Error(txt || res.statusText) });
+        })
+        .then(txt => {
+          msgEl.textContent = txt || 'Cập nhật thành công';
+          msgEl.style.color = 'green';
+        })
+        .catch(err => {
+          msgEl.textContent = err.message || 'Có lỗi xảy ra';
+          msgEl.style.color = 'red';
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
