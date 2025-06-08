@@ -1,18 +1,23 @@
 package com.pbl3.ecommerce.service;
 
-import com.pbl3.ecommerce.dto.ListProductItemDTO;
-import com.pbl3.ecommerce.entity.WishListCategory;
-import com.pbl3.ecommerce.entity.WishListProduct;
-import com.pbl3.ecommerce.entity.ProductItem;
-import com.pbl3.ecommerce.repository.WishListCategoryRepository;
-import com.pbl3.ecommerce.repository.WishListProductRepository;
-import com.pbl3.ecommerce.repository.ProductItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.pbl3.ecommerce.dto.ListProductItemDTO;
+import com.pbl3.ecommerce.entity.AbClient;
+import com.pbl3.ecommerce.entity.ProductItem;
+import com.pbl3.ecommerce.entity.WishListCategory;
+import com.pbl3.ecommerce.entity.WishListProduct;
+import com.pbl3.ecommerce.repository.AbClientRepository;
+import com.pbl3.ecommerce.repository.ProductItemRepository;
+import com.pbl3.ecommerce.repository.WishListCategoryRepository;
+import com.pbl3.ecommerce.repository.WishListProductRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class WishListProductService {
@@ -25,6 +30,8 @@ public class WishListProductService {
 
     @Autowired
     private WishListCategoryRepository wishListCategoryRepository;
+    @Autowired
+    private AbClientRepository abClientRepository;
 
     public String addProductToWishList(Integer wishListId, Integer productId) {
         if (wishListProductRepository.existsByWishListCategory_wishListIDAndProductItem_ProductItemId(wishListId, productId)) {
@@ -57,5 +64,25 @@ public class WishListProductService {
             res.add(new ListProductItemDTO(item));
         }
         return res;
+    }
+    public WishListCategory getOrCreateWishListCategoryForClient(Integer clientId) {
+        // 1) Thử tìm đã có
+        Optional<WishListCategory> opt = wishListCategoryRepository
+            .findByAbClient_ClientID(clientId);
+        if (opt.isPresent()) {
+            return opt.get();
+        }
+
+        // 2) Chưa có → load AbClient từ DB
+        AbClient client = abClientRepository
+            .findById(clientId)
+            .orElseThrow(() -> new EntityNotFoundException(
+                  "Không tìm thấy client với id=" + clientId));
+
+        // 3) Tạo mới category, gắn client
+        WishListCategory newCat = new WishListCategory();
+        newCat.setAbClient(client);
+        // (nếu WishListCategory có các field khác như tên, ngày tạo,... thì set thêm)
+        return wishListCategoryRepository.save(newCat);
     }
 }

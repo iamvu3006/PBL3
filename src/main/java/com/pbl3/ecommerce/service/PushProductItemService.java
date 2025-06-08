@@ -1,15 +1,24 @@
 package com.pbl3.ecommerce.service;
 
-import com.pbl3.ecommerce.dto.PushProductItemDTO;
-import com.pbl3.ecommerce.entity.*;
-import com.pbl3.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.pbl3.ecommerce.dto.PushProductItemDTO;
+import com.pbl3.ecommerce.entity.AbClient;
+import com.pbl3.ecommerce.entity.AbVersion;
+import com.pbl3.ecommerce.entity.Brand;
+import com.pbl3.ecommerce.entity.Descripted;
+import com.pbl3.ecommerce.entity.ProductItem;
+import com.pbl3.ecommerce.entity.SellCategory;
+import com.pbl3.ecommerce.entity.TariffiPackage;
+import com.pbl3.ecommerce.repository.AbClientRepository;
+import com.pbl3.ecommerce.repository.BrandRepository;
+import com.pbl3.ecommerce.repository.ProductItemRepository;
+import com.pbl3.ecommerce.repository.SellCategoryRepository;
+import com.pbl3.ecommerce.repository.TariffiPackageRepository;
 
 @Service
 public class PushProductItemService {
@@ -114,5 +123,7 @@ public class PushProductItemService {
         // Save the product item (Descripted will be saved via cascade)
         return productItemRepository.save(item);
     }
+    
+    
 }
 

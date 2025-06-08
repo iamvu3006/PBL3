@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="@{/css/style.css}">
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: var(--secondary-color);
+      color: #fff;
+    }
+    button.delete-btn {
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    button.delete-btn:hover {
+      opacity: 0.9;
+    }
+    #message {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    #message.success {
+      background: var(--success-color);
+      color: #fff;
+    }
+    #message.error {
+      background: var(--accent-color);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Quản trị viên – Quản lý tài khoản</h1>
+  <p>Admin có quyền xoá các tài khoản user.</p>
+
+  <!-- Thông báo -->
+  <div id="message"></div>
+
+  <!-- Bảng users -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Họ và tên</th>
+        <th>Email</th>
+        <th>Điện thoại</th>
+        <th>Địa chỉ</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody id="usersBody">
+      <!-- JS sẽ chèn vào đây -->
+    </tbody>
+  </table>
+
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    // REST endpoints
+    const listUrl    = /*[[@{/api/admin/clients}]]*/ '/api/admin/clients';
+    const deleteBase = /*[[@{/api/admin/clients/}]]*/ '/api/admin/clients/';
+
+    const msgEl = document.getElementById('message');
+    const tbody = document.getElementById('usersBody');
+
+    // load danh sách
+    function loadUsers() {
+      fetch(listUrl, { credentials: 'same-origin' })
+        .then(res => {
+          if (!res.ok) throw new Error('Không tải được danh sách: ' + res.status);
+          return res.json();
+        })
+        .then(users => {
+          tbody.innerHTML = '';
+          users.forEach(u => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${u.id}</td>
+              <td>${u.clientFullName}</td>
+              <td>${u.clientEmailAdress}</td>
+              <td>${u.clientPhoneNumber}</td>
+              <td>${u.clientAdress || ''}</td>
+              <td>
+                <button class="delete-btn" data-id="${u.id}">
+                  Xóa
+                </button>
+              </td>`;
+            tbody.appendChild(tr);
+          });
+          document.querySelectorAll('.delete-btn').forEach(btn =>
+            btn.addEventListener('click', () => {
+              const userId = btn.dataset.id;
+              if (confirm(`Xác nhận xoá user #${userId}?`)) {
+                deleteUser(userId);
+              }
+            })
+          );
+        })
+        .catch(err => showMessage(err.message, 'error'));
+    }
+
+    // xoá user
+    function deleteUser(id) {
+      fetch(deleteBase + id, {
+        method: 'DELETE',
+        credentials: 'same-origin'
+      })
+      .then(res => {
+        if (!res.ok) return res.text().then(t => { throw new Error(t || res.statusText); });
+        return res.text();
+      })
+      .then(txt => {
+        showMessage(txt || `Xóa user #${id} thành công.`, 'success');
+        loadUsers();
+      })
+      .catch(err => showMessage(err.message, 'error'));
+    }
+
+    // show message
+    function showMessage(text, type) {
+      msgEl.textContent = text;
+      msgEl.className = type;
+      setTimeout(() => msgEl.textContent = '', 5000);
+    }
+
+    // init
+    loadUsers();
+    /*]]>*/
+  </script>
+
+</body>
+</html>
