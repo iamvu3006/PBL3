@@ -1,4 +1,5 @@
 package com.pbl3.ecommerce.entity;
+
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -16,6 +17,10 @@ public class ProductItem {
     @Enumerated(EnumType.STRING)
     @Column(name = "producttype")
     private ProductType producttype;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private Status status = Status.PENDING;
 
     @ManyToOne
     @JoinColumn(name = "clientid")
@@ -67,6 +72,19 @@ public class ProductItem {
 
     // Getters & Setters
 
+    public enum Status{
+        PENDING,
+        APPROVED,
+        REJECTED
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     public Double getPrice() {
         return price;
@@ -80,24 +98,12 @@ public class ProductItem {
         return abclient;
     }
 
-    public void setAbclient(AbClient abclient) {
-        this.abclient = abclient;
-    }
-
-    public void setAbClient(AbClient abClient) {
-        this.abclient = abClient;
-    }
-
     public Integer getInternalMemory() {
         return InternalMemory;
     }
 
     public AbVersion getVersion() {
         return version;
-    }
-
-    public void setVersion(AbVersion version) {
-        this.version = version;
     }
 
     public Brand getBrandid() {
@@ -173,7 +179,7 @@ public class ProductItem {
         this.Brandid = brand;
     }
 
-    public enum ProductType{
+    public enum ProductType {
         LAPTOP, PHONE
     }
 
@@ -189,9 +195,6 @@ public class ProductItem {
         return TariffiPackage;
     }
 
-    public void setTariffiPackage(TariffiPackage tariffiPackage) {
-        this.TariffiPackage = tariffiPackage;
-    }
 
     public SellCategory getSellCategory() {
         return SellCategory;
@@ -213,4 +216,7 @@ public class ProductItem {
         HardDriveType = hardDriveType;
     }
 
+    public void setAbclient(AbClient abclient) {
+        this.abclient = abclient;
+    }
 }

@@ -1,4 +1,5 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -13,8 +14,13 @@ public class AbClient {
 
     @Column(unique = true)
     private String clientUseName;
+
     private String clientPassword;
+
     private String clientFullName;
+
+    @Column(nullable = false)
+    private String role = "USER";
 
     @Column(unique = true)
     private String clientPhoneNumber;
@@ -27,8 +33,9 @@ public class AbClient {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<ProductCategoryClient> productCategoryClients = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, optional = true)
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "wishlistid")
+    @JsonManagedReference                   //danh dau phia chu cau tham chieu
     private WishListCategory wishListCategory;
 
     // getters & setters
@@ -80,6 +87,14 @@ public class AbClient {
 
     public void setClientPassword(String clientPassword) {
         this.clientPassword = clientPassword;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public String getClientFullName() {
