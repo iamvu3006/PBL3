@@ -1,12 +1,15 @@
 package com.pbl3.ecommerce.controller;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.pbl3.ecommerce.entity.AbClient;
 import com.pbl3.ecommerce.entity.WishListCategory;
+import com.pbl3.ecommerce.repository.AbClientRepository;
 import com.pbl3.ecommerce.service.WishListProductService;
 
 /**
@@ -16,28 +19,32 @@ import com.pbl3.ecommerce.service.WishListProductService;
 public class WishListViewController {
 
     @Autowired
+    private AbClientRepository abClientRepository;
+
+    @Autowired
     private WishListProductService wishListProductService;
 
-    /**
-     * Hiển thị trang /wishlist với clientId và wishListId đã nạp sẵn lên Model
-     */
     @GetMapping("/wishlist")
-    public String viewWishList(
-            Model model,
-            @AuthenticationPrincipal(expression = "id") Integer clientId
-            
-    ) {
-        
+    public String viewWishList(Model model, Principal principal) {
+        // Lấy username hiện tại
+        String username = principal.getName();
 
-        
-        WishListCategory wishList = wishListProductService
-            .getOrCreateWishListCategoryForClient(clientId);
+        // Dùng đúng method của repository
+        AbClient client = abClientRepository
+            .findByClientUseName(username)
+            .orElseThrow(() -> 
+                new IllegalArgumentException("Không tìm thấy user: " + username)
+            );
+
+        Integer clientId = client.getClientID();
+
+        // Lấy hoặc tạo wishlist
+        WishListCategory wishList = 
+            wishListProductService.getOrCreateWishListCategoryForClient(clientId);
         Integer wishListId = wishList.getWishListID();
 
-        // Đưa lên Model cho Thymeleaf
         model.addAttribute("clientId", clientId);
         model.addAttribute("wishListId", wishListId);
-
-        return "wishlist";  // Thymeleaf sẽ render templates/wishlist.html
+        return "wishlist";
     }
 }

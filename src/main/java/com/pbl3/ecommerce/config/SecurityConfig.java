@@ -25,6 +25,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                    
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
@@ -33,7 +34,7 @@ public class SecurityConfig {
                                 "/css/**", "/js/**", "/images/**", "/webjars/**",
                                 "/", "/index", "/index.html",
                                 "/login", "/login.html",
-                                "/register", "/register.html"
+                                "/register", "/register.html","/wishlist","/wishlist.html"
 //                                "/cart","/cart.html","/create","/create.html","/api/products/create"
                         ).permitAll()
                         .anyRequest().authenticated()
@@ -41,13 +42,15 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            request.getSession().invalidate();
-                            response.setStatus(HttpStatus.OK.value());
-                        })
-                        .deleteCookies("JSESSIONID")
-                )
+                 .logoutUrl("/api/auth/logout")
+                   .invalidateHttpSession(true)
+                  .deleteCookies("JSESSIONID")
+                  // Thay handler đứng yên trả status bằng redirect tới "/"
+                   .logoutSuccessHandler((request, response, authentication) -> {
+                      response.sendRedirect("/");    // chuyển về index
+             })
+                  .permitAll()
+)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
