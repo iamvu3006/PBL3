@@ -15,6 +15,7 @@ public class ProductItemDTO {
     private String Inchs;
     private String normalDescribe;
     private String version;
+    private double price;
     private Integer productRam;
     private Integer internalMemory;
     private String brandName;
@@ -32,6 +33,12 @@ public class ProductItemDTO {
                 }
             } else {
                 logger.warn("AbClient là null cho ProductItem có ID: {}", item.getProductItemId());
+            }
+
+            if(item.getPrice() != 0){
+                this.price = item.getPrice();
+            } else{
+                logger.warn("Co loi khi lay gia san pham tai :{}", item.getProductItemId());
             }
 
             if(item.getVersion().getVersionName() != null){
@@ -106,6 +113,7 @@ public class ProductItemDTO {
         }
     }
 
+    public ProductItemDTO(){ }
 
     // Getters
     public String getClientPhoneNumber() {
@@ -150,6 +158,14 @@ public class ProductItemDTO {
 
     public String getVersion() {
         return version;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public void setNormalDescribe(String normalDescribe) {
