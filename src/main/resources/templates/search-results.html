@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Kết quả tìm kiếm</title>
+  <link rel="stylesheet" href="@{/css/style.css}">
+</head>
+<body>
+  <!-- Import lại header có form search để người dùng chỉnh từ khoá -->
+  <header th:insert="fragments/header :: header"></header>
+
+  <main>
+    <h2>Kết quả tìm kiếm cho "<span th:text="${q}">...</span>"</h2>
+    <div th:if="${#lists.isEmpty(results)}">
+      <p>Không tìm thấy kết quả nào.</p>
+    </div>
+    <ul th:if="${!#lists.isEmpty(results)}">
+      <li th:each="item : ${results}">
+        <a th:href="@{/products/{id}(id=${item.id})}" 
+           th:text="${item.title}">Tên sản phẩm</a>
+        – <span th:text="${item.price}">0</span>₫
+      </li>
+    </ul>
+  </main>
+</body>
+</html>

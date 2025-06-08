@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thông tin tài khoản</title>
+  <link rel="stylesheet" href="@{/css/style.css}">
+  <style>
+    .profile-card {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+    .profile-card h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: var(--secondary-color);
+    }
+    .profile-field {
+      margin-bottom: 1rem;
+    }
+    .profile-label {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    .profile-value {
+      display: block;
+      margin-top: 0.2rem;
+      font-size: 1rem;
+      color: #333;
+    }
+    .btn-update {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 0.75rem;
+      background: var(--secondary-color);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      margin-top: 1.5rem;
+    }
+    .btn-update:hover {
+      background: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card" th:object="${clientDTO}">
+    <h2>Thông tin tài khoản</h2>
+
+    <div class="profile-field">
+      <div class="profile-label">Họ và tên:</div>
+      <div class="profile-value" th:text="*{clientFullName}">Nguyễn Văn A</div>
+    </div>
+
+    <div class="profile-field">
+      <div class="profile-label">Email:</div>
+      <div class="profile-value" th:text="*{clientEmailAdress}">email@example.com</div>
+    </div>
+
+    <div class="profile-field">
+      <div class="profile-label">Số điện thoại:</div>
+      <div class="profile-value" th:text="*{clientPhoneNumber}">0123456789</div>
+    </div>
+
+    <div class="profile-field">
+      <div class="profile-label">Địa chỉ:</div>
+      <div class="profile-value" th:text="*{clientAdress}">123 Đường ABC, Quận X</div>
+    </div>
+
+    <!-- Nút dẫn sang trang chỉnh sửa profile cũ -->
+    <a th:href="@{/client/{id}/profile(id=${clientDTO.id})}"
+       class="btn-update">
+      Cập nhật tài khoản
+    </a>
+  </div>
+</body>
+</html>
