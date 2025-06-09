@@ -19,11 +19,12 @@ public class AuthService {
 
     private final AbClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final SellCategoryRepository sellCategoryRepository;
     @Autowired
-    public AuthService(AbClientRepository clientRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(AbClientRepository clientRepository, PasswordEncoder passwordEncoder, SellCategoryRepository sellCategoryRepository) {
         this.clientRepository = clientRepository;
         this.passwordEncoder = passwordEncoder;
+        this.sellCategoryRepository = sellCategoryRepository;
     }
 
     // public AuthResponse login(LoginRequest loginRequest) {
@@ -107,6 +108,11 @@ public class AuthService {
 
             // Lưu client vào database (cascade sẽ tự động lưu wishlist)
             AbClient savedClient = clientRepository.save(newClient);
+
+            //Tao sellcategory moi
+            SellCategory sellCategory = new SellCategory();
+            sellCategory.setClient(savedClient);
+            sellCategoryRepository.save(sellCategory);
 
             return new AuthResponse(true, "Đăng ký thành công", savedClient.getClientID(), savedClient.getClientUseName());
         } catch (Exception e) {
