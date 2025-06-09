@@ -44,7 +44,7 @@ public class PushProductItemService {
     }
 
     @Transactional
-    public ProductItem createProductItem(PushProductItemDTO dto) throws Exception {
+    public ProductItem createProductItem(PushProductItemDTO dto, String username) throws Exception {
         // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
 
