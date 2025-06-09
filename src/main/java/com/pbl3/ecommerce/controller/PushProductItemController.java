@@ -9,7 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.ResponseEntity;
 import com.pbl3.ecommerce.dto.PushProductItemDTO;
 import com.pbl3.ecommerce.service.PushProductItemService;
 import com.pbl3.ecommerce.repository.BrandRepository;
@@ -30,11 +31,26 @@ public class PushProductItemController {
     @Autowired
     private TariffiPackageRepository tariffRepo;
 
-    @PostMapping("/create")
-    @ResponseBody
-    public String createProduct(@RequestBody PushProductItemDTO dto) throws Exception {
-        productItemService.createProductItem(dto);
-        return "Đăng bán sản phẩm thành công!";
+     @PostMapping("/create")
+    public ResponseEntity<String> createProduct(
+            @RequestBody PushProductItemDTO dto,
+            HttpSession session) {
+
+        // Kiểm tra đăng nhập
+        Boolean isLoggedIn = (Boolean) session.getAttribute("isLoggedIn");
+        if (isLoggedIn == null || !isLoggedIn) {
+            return ResponseEntity.status(401).body("Vui lòng đăng nhập");
+        }
+
+        // Lấy username từ session
+        String username = (String) session.getAttribute("username");
+
+        try {
+            productItemService.createProductItem(dto, username); // Truyền username vào
+            return ResponseEntity.ok("Đăng bán sản phẩm thành công!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi: " + e.getMessage());
+        }
     }
 
     @GetMapping("/create")
