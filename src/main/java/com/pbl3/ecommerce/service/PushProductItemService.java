@@ -62,7 +62,7 @@ public class PushProductItemService {
             client.setSellCategory(sc);
             clientRepository.save(client);
         }
-
+        item.setSellCategory(sc);
         // Set basic properties
 
         item.setColor(dto.getColorName());
