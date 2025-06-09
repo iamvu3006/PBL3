@@ -1,6 +1,7 @@
 package com.pbl3.ecommerce.dto;
 
 public class ClientDTO {
+     private Integer id; 
     private String clientFullName;
     private String clientPhoneNumber;
     private String clientEmailAdress;
@@ -16,6 +17,19 @@ public class ClientDTO {
         this.clientEmailAdress = clientEmailAdress;
         this.clientAdress = clientAdress;
     }
+     public ClientDTO(Integer id,
+                     String clientFullName,
+                     String clientPhoneNumber,
+                     String clientEmailAdress,
+                     String clientAdress) {
+        this.id = id;
+        this.clientFullName = clientFullName;
+        this.clientPhoneNumber = clientPhoneNumber;
+        this.clientEmailAdress = clientEmailAdress;
+        this.clientAdress = clientAdress;
+    }
+     public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     // Getters & Setters
     public String getClientFullName() {

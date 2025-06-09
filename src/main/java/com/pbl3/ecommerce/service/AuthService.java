@@ -1,5 +1,11 @@
 package com.pbl3.ecommerce.service;
 
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.pbl3.ecommerce.dto.AuthResponse;
 import com.pbl3.ecommerce.dto.ClientDTO;
 import com.pbl3.ecommerce.dto.LoginRequest;
@@ -7,11 +13,6 @@ import com.pbl3.ecommerce.dto.RegisterRequest;
 import com.pbl3.ecommerce.entity.AbClient;
 import com.pbl3.ecommerce.entity.WishListCategory;
 import com.pbl3.ecommerce.repository.AbClientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -92,12 +93,25 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
         return new ClientDTO(
+            client.getClientID(),
             client.getClientFullName(),
             client.getClientPhoneNumber(),
             client.getClientEmailAdress(),
             client.getClientAdress()
         );
     }
+    public ClientDTO getClientByUsername(String username) {
+        AbClient client = clientRepository.findByClientUseName(username)
+            .orElseThrow(() -> new RuntimeException("Client not found: " + username));
+        return new ClientDTO(
+            client.getClientID(),
+            client.getClientFullName(),
+            client.getClientPhoneNumber(),
+            client.getClientEmailAdress(),
+            client.getClientAdress()
+        );
+    }
+
 
     public boolean updateClientProfile(Integer clientId, ClientDTO requestDTO) {
         AbClient client = clientRepository.findById(clientId)
@@ -127,4 +141,5 @@ public class AuthService {
         clientRepository.save(client);
         return true;
     }
+    
 }
