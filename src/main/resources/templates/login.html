@@ -181,21 +181,29 @@
     <form id="login-form" class="login-form">
       <div id="error-message" class="alert alert-danger" style="display:none;"></div>
 
-      <div class="form-group">
+       <div class="form-group">
         <label for="login-username">Tên đăng nhập</label>
-        <input type="text" id="login-username" name="username" class="form-control"
-               placeholder="Nhập tên đăng nhập" required>
+        <input
+          type="text"
+          id="login-username"
+          name="username"
+          class="form-control"
+          placeholder="Nhập tên đăng nhập"
+          required
+        >
       </div>
 
       <div class="form-group">
         <label for="login-password">Mật khẩu</label>
-        <input type="password" id="login-password" name="password" class="form-control"
-               placeholder="Nhập mật khẩu" required>
+        <input
+          type="password"
+          id="login-password"
+          name="password"
+          class="form-control"
+          placeholder="Nhập mật khẩu"
+          required
+        >
         <i class="fas fa-eye password-toggle" id="toggle-password"></i>
-      </div>
-
-      <div class="form-group" style="text-align:right;">
-        <a th:href="@{/forgot-password}" style="font-size:.875rem;">Quên mật khẩu?</a>
       </div>
 
       <button type="submit" class="btn btn-primary">
@@ -224,84 +232,83 @@
 </div>
 
 <script>
-  document.getElementById('login-form').addEventListener('submit', function(e) {
-    e.preventDefault(); // Ngăn form submit mặc định
+  // document.getElementById('login-form').addEventListener('submit', function(e) {
+  //   e.preventDefault(); 
 
-    const username = document.getElementById('login-username').value;
-    const password = document.getElementById('login-password').value;
-    const errorElement = document.getElementById('error-message');
+  //   const username = document.getElementById('login-username').value;
+  //   const password = document.getElementById('login-password').value;
+  //   const errorElement = document.getElementById('error-message');
 
-    // Xóa thông báo lỗi trước đó
-    errorElement.textContent = '';
-    errorElement.style.display = 'none';
+   
+  //   errorElement.textContent = '';
+  //   errorElement.style.display = 'none';
 
-    console.log("Attempting login for user:", username);
+  //   console.log("Attempting login for user:", username);
 
-    // Dữ liệu đăng nhập
-    const loginData = {
-      username: username,
-      password: password
-    };
+    
+  //   const loginData = {
+  //     username: username,
+  //     password: password
+  //   };
 
-    console.log("Login payload:", JSON.stringify(loginData));
+  //   console.log("Login payload:", JSON.stringify(loginData));
 
-    // Gửi request đăng nhập với debug
-    fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(loginData),
-      credentials: 'same-origin' // Quan trọng để lưu session
-    })
-            .then(response => {
-              console.log("Response status:", response.status);
-              console.log("Response headers:", response.headers);
+  //   fetch('/api/auth/login', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Accept': 'application/json'
+  //     },
+  //     body: JSON.stringify(loginData),
+  //     credentials: 'same-origin' 
+  //   })
+  //           .then(response => {
+  //             console.log("Response status:", response.status);
+  //             console.log("Response headers:", response.headers);
 
-              // Log header content-type
-              const contentType = response.headers.get('content-type');
-              console.log("Content-Type:", contentType);
+            
+  //             const contentType = response.headers.get('content-type');
+  //             console.log("Content-Type:", contentType);
 
-              // Kiểm tra response có status ok và content-type đúng
-              if (!response.ok) {
-                return response.text().then(text => {
-                  console.error("Error response:", text);
-                  throw new Error(`HTTP error! status: ${response.status}`);
-                });
-              }
+           
+  //             if (!response.ok) {
+  //               return response.text().then(text => {
+  //                 console.error("Error response:", text);
+  //                 throw new Error(`HTTP error! status: ${response.status}`);
+  //               });
+  //             }
 
-              if (contentType && contentType.includes('application/json')) {
-                return response.json();
-              } else {
-                // Nếu không phải JSON, log response text và throw error
-                return response.text().then(text => {
-                  console.error("Non-JSON response:", text);
-                  throw new Error('Không nhận được dữ liệu JSON từ server!');
-                });
-              }
-            })
-            .then(data => {
-              console.log('Response data:', data);
+  //             if (contentType && contentType.includes('application/json')) {
+  //               return response.json();
+  //             } else {
+               
+  //               return response.text().then(text => {
+  //                 console.error("Non-JSON response:", text);
+  //                 throw new Error('Không nhận được dữ liệu JSON từ server!');
+  //               });
+  //             }
+  //           })
+  //           .then(data => {
+  //             console.log('Response data:', data);
 
-              if (data.success) {
-                console.log('Login successful, redirecting...');
-                window.location.href = '/';
-              } else {
-                errorElement.textContent = data.message || 'Đăng nhập thất bại';
-                errorElement.style.display = 'block';
-                errorElement.style.color = 'red';
-              }
-            })
-            .catch(error => {
-              console.error('Login error:', error);
-              errorElement.textContent = error.message || 'Đã xảy ra lỗi khi đăng nhập';
-              errorElement.style.display = 'block';
-              errorElement.style.color = 'red';
-            });
-  });
+  //             if (data.success) {
+  //               console.log('Login successful, redirecting...');
+  //               window.location.href = '/';
+  //             } else {
+  //               errorElement.textContent = data.message || 'Đăng nhập thất bại';
+  //               errorElement.style.display = 'block';
+  //               errorElement.style.color = 'red';
+  //             }
+  //           })
+  //           .catch(error => {
+  //             console.error('Login error:', error);
+  //             errorElement.textContent = error.message || 'Đã xảy ra lỗi khi đăng nhập';
+  //             errorElement.style.display = 'block';
+  //             errorElement.style.color = 'red';
+  //           });
+  // });
 
-  // Thêm tính năng hiển thị/ẩn mật khẩu
+ 
   document.getElementById('toggle-password').addEventListener('click', function() {
     const passwordInput = document.getElementById('login-password');
     if (passwordInput.type === 'password') {
@@ -313,6 +320,56 @@
       this.classList.remove('fa-eye-slash');
       this.classList.add('fa-eye');
     }
+  });
+   document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault(); 
+
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const errorElement = document.getElementById('error-message');
+
+    errorElement.textContent = '';
+    errorElement.style.display = 'none';
+
+    const loginData = { username, password };
+
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(loginData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.text().then(text => {
+          throw new Error(text || `HTTP error ${response.status}`);
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        // Nếu server trả về role, ví dụ data.role = "ADMIN" hoặc "USER"
+        if (data.role === 'ADMIN') {
+          window.location.href = '/admin';       // Trang dành cho admin
+        } else {
+          window.location.href = '/'; // Trang dành cho user
+        }
+      } else {
+        errorElement.textContent = data.message || 'Đăng nhập thất bại';
+        errorElement.style.display = 'block';
+        errorElement.style.color = 'red';
+      }
+    })
+    .catch(error => {
+      console.error('Login error:', error);
+      errorElement.textContent = error.message || 'Đã xảy ra lỗi khi đăng nhập';
+      errorElement.style.display = 'block';
+      errorElement.style.color = 'red';
+    });
   });
 </script>
 </body>

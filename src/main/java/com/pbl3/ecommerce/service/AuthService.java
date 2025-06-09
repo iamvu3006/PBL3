@@ -26,13 +26,42 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // public AuthResponse login(LoginRequest loginRequest) {
+    //     Optional<AbClient> clientOptional = clientRepository.findByClientUseName(loginRequest.getUsername());
+    //     try {
+    //         if (clientOptional.isPresent()) {
+    //             AbClient client = clientOptional.get();
+    //             if (passwordEncoder.matches(loginRequest.getPassword(), client.getClientPassword())) {
+    //                 return new AuthResponse(true, "Đăng nhập thành công", client.getClientID(), client.getClientUseName());
+    //             } else {
+    //                 return new AuthResponse(false, "Mật khẩu không chính xác");
+    //             }
+    //         } else {
+    //             return new AuthResponse(false, "Tên đăng nhập không tồn tại");
+    //         }
+    //     } catch (Exception e) {
+            
+    //         e.printStackTrace();
+    //         return new AuthResponse(false, "Lỗi hệ thống: " + e.getMessage());
+    //     }
+    // }
     public AuthResponse login(LoginRequest loginRequest) {
-        Optional<AbClient> clientOptional = clientRepository.findByClientUseName(loginRequest.getUsername());
+        Optional<AbClient> clientOptional =
+            clientRepository.findByClientUseName(loginRequest.getUsername());
+
         try {
             if (clientOptional.isPresent()) {
                 AbClient client = clientOptional.get();
                 if (passwordEncoder.matches(loginRequest.getPassword(), client.getClientPassword())) {
-                    return new AuthResponse(true, "Đăng nhập thành công", client.getClientID(), client.getClientUseName());
+                    // Lấy role từ entity (giả sử bạn đã lưu trong AbClient)
+                    String role = client.getRole();  // e.g. "ADMIN" hoặc "USER"
+                    return new AuthResponse(
+                        true,
+                        "Đăng nhập thành công",
+                        client.getClientID(),
+                        client.getClientUseName(),
+                        role                        // ← truyền role vào đây
+                    );
                 } else {
                     return new AuthResponse(false, "Mật khẩu không chính xác");
                 }
@@ -40,7 +69,6 @@ public class AuthService {
                 return new AuthResponse(false, "Tên đăng nhập không tồn tại");
             }
         } catch (Exception e) {
-            // Log lỗi và trả về thông báo
             e.printStackTrace();
             return new AuthResponse(false, "Lỗi hệ thống: " + e.getMessage());
         }
