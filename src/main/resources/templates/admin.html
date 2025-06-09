@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
- <link rel="stylesheet" th:href="@{/css/layout.css}"/>
- 
-</head>
-<style>
+  <link rel="stylesheet" href="@{/css/style.css}">
+  <style>
     :root {
       --primary-color: #2c3e50;
       --secondary-color: #3498db;
@@ -14,22 +12,18 @@
       --light-color: #ecf0f1;
       --card-bg: #ffffff;
       --text-color: #2c3e50;
-      --dark-color: #2c3e50;
       --success-color: #27ae60;
       --warning-color: #f39c12;
       --border-radius: 10px;
       --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       --transition: all 0.3s ease;
     }
-
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: var(--light-color);
       color: var(--text-color);
     }
-
-    /* Header */
     .header {
       display: flex;
       justify-content: space-between;
@@ -43,7 +37,10 @@
       margin: 0;
       font-size: 1.8rem;
     }
-    .header button.logout-btn {
+    .header form {
+      margin: 0;
+    }
+    .header button {
       background: var(--accent-color);
       border: none;
       color: #fff;
@@ -51,12 +48,11 @@
       border-radius: var(--border-radius);
       cursor: pointer;
       transition: var(--transition);
+      font-size: 0.9rem;
     }
-    .header button.logout-btn:hover {
+    .header button:hover {
       opacity: 0.85;
     }
-
-    /* Tabs */
     .tabs {
       display: flex;
       margin: 1.5rem 2rem;
@@ -73,8 +69,6 @@
       color: var(--secondary-color);
       font-weight: bold;
     }
-
-    /* Container */
     .table-container {
       background: var(--card-bg);
       margin: 0 2rem 2rem;
@@ -82,7 +76,6 @@
       border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -91,13 +84,12 @@
       padding: 0.75rem;
       text-align: left;
       border-bottom: 1px solid #ddd;
+      font-size: 0.95rem;
     }
     th {
       background: var(--secondary-color);
       color: #fff;
     }
-
-    /* Buttons */
     .btn {
       padding: 0.4rem 0.8rem;
       border: none;
@@ -106,14 +98,28 @@
       transition: var(--transition);
       font-size: 0.85rem;
     }
-    .btn.delete { background: var(--accent-color); color: #fff; }
-    .btn.delete:hover { opacity: 0.85; }
-    .btn.approve { background: var(--success-color); color: #fff; }
-    .btn.approve:hover { opacity: 0.85; }
-    .btn.reject { background: var(--warning-color); color: #fff; margin-left: 0.5rem; }
-    .btn.reject:hover { opacity: 0.85; }
-
-    /* Message */
+    .btn.delete {
+      background: var(--accent-color);
+      color: #fff;
+    }
+    .btn.delete:hover {
+      opacity: 0.85;
+    }
+    .btn.approve {
+      background: var(--success-color);
+      color: #fff;
+    }
+    .btn.approve:hover {
+      opacity: 0.85;
+    }
+    .btn.reject {
+      background: var(--warning-color);
+      color: #fff;
+      margin-left: 0.5rem;
+    }
+    .btn.reject:hover {
+      opacity: 0.85;
+    }
     #message {
       margin: 0 2rem 1rem;
       padding: 0.75rem 1rem;
@@ -121,15 +127,29 @@
       font-weight: 500;
       display: none;
     }
-    #message.success { background: var(--success-color); color: #fff; display: block; }
-    #message.error { background: var(--accent-color); color: #fff; display: block; }
+    #message.success {
+      background: var(--success-color);
+      color: #fff;
+      display: block;
+    }
+    #message.error {
+      background: var(--accent-color);
+      color: #fff;
+      display: block;
+    }
   </style>
+</head>
 <body>
-
   <!-- Header -->
   <div class="header">
     <h1>Admin Dashboard</h1>
-    <button class="logout-btn" onclick="logout()">Đăng Xuất</button>
+    <form th:action="@{/api/auth/logout}" method="post" style="margin:0;">
+      <button type="submit"
+              style="background:var(--accent-color);border:none;color:#fff;
+                     padding:0.5rem 1rem;border-radius:var(--border-radius);">
+        <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+      </button>
+    </form>
   </div>
 
   <!-- Tabs -->
@@ -146,7 +166,12 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th><th>Họ và tên</th><th>Email</th><th>Điện thoại</th><th>Địa chỉ</th><th>Hành động</th>
+          <th>ID</th>
+          <th>Họ và tên</th>
+          <th>Email</th>
+          <th>Điện thoại</th>
+          <th>Địa chỉ</th>
+          <th>Hành động</th>
         </tr>
       </thead>
       <tbody id="usersBody"></tbody>
@@ -158,114 +183,112 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th><th>Tên SP</th><th>Giá</th><th>Trạng thái</th><th>Hành động</th>
+          <th>ID</th>
+          <th>Tên SP</th>
+          <th>Giá</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
         </tr>
       </thead>
       <tbody id="productsBody"></tbody>
     </table>
   </div>
 
-  <script th:inline="javascript">
-  /*<![CDATA[*/
-    const apiBase      = /*[[@{/api/admin}]]*/ '/api/admin';
-    const usersUrl     = apiBase + '/clients';
-    const productsUrl  = apiBase + '/products/pending';
-    const logoutUrl    = /*[[@{/logout}]]*/ '/logout';
-
-    const msgEl        = document.getElementById('message');
-    const usersBody    = document.getElementById('usersBody');
-    const productsBody = document.getElementById('productsBody');
-
-    // Logout function
-    function logout() {
-      fetch(logoutUrl, { method:'POST', credentials:'same-origin' })
-        .finally(() => window.location.href = '/login.html');
-    }
+  <script>
+    const apiBase     = '/api/admin';
+    const usersUrl    = apiBase + '/clients';
+    const productsUrl = apiBase + '/products/pending';
+    const msgEl       = document.getElementById('message');
+    const usersBody   = document.getElementById('usersBody');
+    const productsBody= document.getElementById('productsBody');
 
     // Tab switching
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        document.getElementById('users-section').style.display    = tab.dataset.tab==='users'    ? '' : 'none';
-        document.getElementById('products-section').style.display = tab.dataset.tab==='products' ? '' : 'none';
-        if(tab.dataset.tab==='users') loadUsers();
-        if(tab.dataset.tab==='products') loadProducts();
+        document.getElementById('users-section').style.display =
+          tab.dataset.tab === 'users' ? '' : 'none';
+        document.getElementById('products-section').style.display =
+          tab.dataset.tab === 'products' ? '' : 'none';
+        if (tab.dataset.tab === 'users') loadUsers();
+        else loadProducts();
       });
     });
 
     // Load users
-    function loadUsers(){
+    function loadUsers() {
       fetch(usersUrl, { credentials: 'same-origin' })
-        .then(r=> { if(!r.ok) throw new Error(r.statusText); return r.json(); })
-        .then(users=>{
+        .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+        .then(list => {
           usersBody.innerHTML = '';
-          users.forEach(u=>{
+          list.forEach(u => {
             const tr = document.createElement('tr');
             tr.innerHTML =
-              `<td>${u.id}</td>`+
-              `<td>${u.fullName}</td>`+
-              `<td>${u.email}</td>`+
-              `<td>${u.phoneNumber}</td>`+
-              `<td>${u.address||''}</td>`+
+              `<td>${u.id}</td>` +
+              `<td>${u.fullName}</td>` +
+              `<td>${u.email}</td>` +
+              `<td>${u.phoneNumber || ''}</td>` +
+              `<td>${u.address || ''}</td>` +
               `<td><button class="btn delete" onclick="deleteUser(${u.id})">Xóa</button></td>`;
             usersBody.appendChild(tr);
           });
         })
-        .catch(e=> showMessage('Lỗi tải user: '+e.message,'error'));
+        .catch(e => showMessage('Lỗi tải user: ' + e, 'error'));
     }
 
     // Delete user
-    function deleteUser(id){
-      if(!confirm('Xác nhận xóa user #' + id + '?')) return;
-      fetch(`${usersUrl}/${id}`, { method:'DELETE', credentials:'same-origin' })
-        .then(r=> { if(!r.ok) return r.text().then(t=>{throw new Error(t||r.statusText)}); return r.text(); })
-        .then(txt=> { showMessage(txt,'success'); loadUsers(); })
-        .catch(e=> showMessage('Lỗi xóa: '+e.message,'error'));
+    function deleteUser(id) {
+      if (!confirm('Xác nhận xóa user #' + id + '?')) return;
+      fetch(`${usersUrl}/${id}`, { method: 'DELETE', credentials: 'same-origin' })
+        .then(r => r.ok ? r.text() : r.text().then(t => Promise.reject(t)))
+        .then(msg => { showMessage(msg, 'success'); loadUsers(); })
+        .catch(e => showMessage('Lỗi xóa: ' + e, 'error'));
     }
 
-    // Load products pending
-    function loadProducts(){
+    // Load products
+    function loadProducts() {
       fetch(productsUrl, { credentials: 'same-origin' })
-        .then(r=> { if(!r.ok) throw new Error(r.statusText); return r.json(); })
-        .then(items=>{
+        .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
+        .then(list => {
           productsBody.innerHTML = '';
-          items.forEach(p=>{
+          list.forEach(p => {
             const tr = document.createElement('tr');
             tr.innerHTML =
-              `<td>${p.id}</td>`+
-              `<td>${p.brandName} ${p.version}</td>`+
-              `<td>${p.price}</td>`+
-              `<td>${p.status}</td>`+
-              `<td>`+
-                `<button class="btn approve" onclick="manageProduct(${p.id},'approve')">Duyệt</button>`+
-                `<button class="btn reject" onclick="manageProduct(${p.id},'reject')">Từ chối</button>`+
+              `<td>${p.id}</td>` +
+              `<td>${p.brandName} ${p.version}</td>` +
+              `<td>${p.price}</td>` +
+              `<td>${p.status}</td>` +
+              `<td>` +
+                `<button class="btn approve" onclick="manageProduct(${p.id},'approve')">Duyệt</button>` +
+                ` <button class="btn reject" onclick="manageProduct(${p.id},'reject')">Từ chối</button>` +
               `</td>`;
             productsBody.appendChild(tr);
           });
         })
-        .catch(e=> showMessage('Lỗi tải sản phẩm: '+e.message,'error'));
+        .catch(e => showMessage('Lỗi tải sản phẩm: ' + e, 'error'));
     }
 
-    // Approve or reject product
-    function manageProduct(id, action){
-      fetch(`${apiBase}/products/${id}/${action}`, { method:'PUT', credentials:'same-origin' })
-        .then(r=> { if(!r.ok) return r.text().then(t=>{throw new Error(t||r.statusText)}); return r.text(); })
-        .then(txt=> { showMessage(txt,'success'); loadProducts(); })
-        .catch(e=> showMessage('Lỗi: '+e.message,'error'));
+    // Approve/reject product
+    function manageProduct(id, action) {
+      fetch(`/api/admin/products/${id}/${action}`, {
+        method: 'PUT',
+        credentials: 'same-origin'
+      })
+      .then(r => r.ok ? r.text() : r.text().then(t => Promise.reject(t)))
+      .then(msg => { showMessage(msg, 'success'); loadProducts(); })
+      .catch(e => showMessage('Lỗi: ' + e, 'error'));
     }
 
     // Show message
-    function showMessage(text, type){
+    function showMessage(text, type) {
       msgEl.textContent = text;
       msgEl.className = type;
-      setTimeout(()=> msgEl.textContent = '', 4000);
+      setTimeout(() => msgEl.textContent = '', 4000);
     }
 
-    // Init users tab
+    // Initialize
     loadUsers();
-  /*]]>*/
   </script>
-
 </body>
 </html>
