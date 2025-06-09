@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <title>Hồ sơ cá nhân</title>
   <!-- CSS của bạn -->
-  <link rel="stylesheet" th:href="@{/css/view-profile.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+ <link rel="stylesheet" th:href="@{/css/view-profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/header.css}" />
+<link rel="stylesheet" th:href="@{/css/footer.css}" />
   <!-- Font Awesome để hiển thị icon sao -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
+  <div th:insert="fragments/header :: siteHeader"></div>
   <div class="page-container">
     <main class="profile-page">
 
@@ -67,6 +71,7 @@
       </section>
 
     </main>
+    <div th:insert="layout :: siteFooter"></div>
   </div>
 </body>
 </html>

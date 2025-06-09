@@ -3,50 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <title>Chỉnh sửa hồ sơ</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  <link rel="stylesheet" th:href="@{/css/header.css}" />
   <link rel="stylesheet" th:href="@{/css/view-profile.css}" />
+  <link rel="stylesheet" th:href="@{/css/footer.css}" />
+  <!-- FontAwesome nếu bạn cần icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
 
-  <section class="profile-card edit-card" th:object="${clientDTO}">
-    <h2 class="profile-title">Chỉnh sửa hồ sơ</h2>
+  <!-- Chèn Header chung -->
+  <div th:insert="fragments/header :: siteHeader"></div>
 
-    <form th:action="@{/profile/edit}" method="post">
-      <div class="form-group">
-        <label for="fullName">Họ và tên</label>
-        <input id="fullName" type="text" th:field="*{clientFullName}" required />
-      </div>
+  <div class="page-container">
+    <main class="profile-page">
+      <section class="profile-card" th:object="${clientDTO}">
+        <h2 class="profile-title">Chỉnh sửa hồ sơ</h2>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input id="email" type="email" th:field="*{clientEmailAdress}" required />
-      </div>
+        <form th:action="@{/profile/edit}" method="post">
+          <div class="profile-info">
+            <div class="info-item">
+              <label for="clientFullName" class="label">Họ và tên</label>
+              <input type="text" id="clientFullName" name="clientFullName"
+                     class="value" 
+                     th:value="*{clientFullName}" required/>
+            </div>
 
-      <div class="form-group">
-        <label for="phone">Điện thoại</label>
-        <input id="phone" type="tel" th:field="*{clientPhoneNumber}" />
-      </div>
+            <div class="info-item">
+              <label for="clientEmailAdress" class="label">Email</label>
+              <input type="email" id="clientEmailAdress" name="clientEmailAdress"
+                     class="value" 
+                     th:value="*{clientEmailAdress}" required/>
+            </div>
 
-      <div class="form-group">
-        <label for="address">Địa chỉ</label>
-        <textarea id="address" rows="3" th:field="*{clientAdress}"></textarea>
-      </div>
+            <div class="info-item">
+              <label for="clientPhoneNumber" class="label">Điện thoại</label>
+              <input type="text" id="clientPhoneNumber" name="clientPhoneNumber"
+                     class="value" 
+                     th:value="*{clientPhoneNumber}" required/>
+            </div>
 
-      <div class="form-group">
-        <label for="currentPassword">Mật khẩu hiện tại</label>
-        <input id="currentPassword" type="password" th:field="*{currentPassword}" required />
-      </div>
+            <div class="info-item">
+              <label for="clientAdress" class="label">Địa chỉ</label>
+              <input type="text" id="clientAdress" name="clientAdress"
+                     class="value" 
+                     th:value="*{clientAdress}" required/>
+            </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-        <a th:href="@{/profile}" class="btn btn-secondary">Hủy</a>
-      </div>
+            <div class="info-item">
+              <label for="currentPassword" class="label">Mật khẩu hiện tại</label>
+              <input type="password" id="currentPassword" name="currentPassword"
+                     class="value" placeholder="Nhập mật khẩu để xác nhận" required/>
+            </div>
+          </div>
 
-      <div th:if="${error}" class="message error">
-        <i class="fas fa-exclamation-circle"></i>
-        <span th:text="${error}"></span>
-      </div>
-    </form>
-  </section>
+          <div class="profile-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+            <a th:href="@{/profile}" class="btn btn-warning">
+              <i class="fas fa-times"></i> Hủy
+            </a>
+          </div>
+
+          <div th:if="${error}" class="message warning">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}"></span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- Chèn Footer chung -->
+  <div th:insert="fragments/footer :: siteFooter"></div>
 
 </body>
 </html>

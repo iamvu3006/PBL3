@@ -1,0 +1,74 @@
+<!-- src/main/resources/templates/fragments/header.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    
+    <header th:fragment="siteHeader">
+      <div class="container header-container">
+        <a th:href="@{/}" class="logo">
+          <i class="fas fa-store"></i>
+          <span>Chợ Không Tốt</span>
+        </a>
+
+        <div class="nav-container">
+          <!-- Dropdown Tài khoản -->
+          <div class="user-nav dropdown">
+            <a href="#" class="nav-link dropdown-toggle" 
+               id="account-toggle" data-toggle="dropdown">
+              <i class="fas fa-user-circle"></i> Tài khoản
+              <i class="fas fa-chevron-down small-icon"></i>
+            </a>
+            <div class="dropdown-menu" aria-labelledby="account-toggle">
+
+              <!-- Khi chưa đăng nhập -->
+              <div sec:authorize="isAnonymous()">
+                <div class="dropdown-header"><strong>Đăng nhập / Đăng ký</strong></div>
+                <a th:href="@{/login}" class="dropdown-item">
+                  <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+                </a>
+                <a th:href="@{/register}" class="dropdown-item">
+                  <i class="fas fa-user-plus"></i> Đăng Ký
+                </a>
+              </div>
+
+              <!-- Khi đã đăng nhập -->
+              <div sec:authorize="isAuthenticated()">
+                <div class="dropdown-header">
+                  <strong>Xin chào, <span th:text="${#authentication.name}">User</span></strong>
+                </div>
+                <a th:href="@{/profile}" class="dropdown-item">
+                  <i class="fas fa-id-card"></i> Hồ sơ
+                </a>
+                <a th:href="@{/wishlist}" class="dropdown-item">
+                  <i class="fas fa-heart"></i> Tin đăng đã lưu
+                </a>
+                <a th:href="@{/api/products/create}" class="dropdown-item">
+                  <i class="fas fa-plus-circle"></i> Đăng Tin
+                </a>
+                <div class="dropdown-divider"></div>
+                <form th:action="@{/api/auth/logout}" method="post">
+                  <button type="submit" class="nav-link btn-logout">
+                    <i class="fas fa-sign-out-alt"></i> Đăng Xuất
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search bar -->
+      <div class="container">
+        <form class="search-form" th:action="@{/products/search}" method="get">
+          <input type="text" class="search-input" name="keyword"
+                 placeholder="Tìm kiếm sản phẩm, danh mục..." required>
+          <button type="submit" class="search-button">
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+      </div>
+    </header>
+  </body>
+</html>
