@@ -1,4 +1,5 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -30,6 +31,10 @@ public class AbClient {
 
     private String clientAdress;
 
+    @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private SellCategory sellCategory;
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<ProductCategoryClient> productCategoryClients = new ArrayList<>();
 
@@ -39,6 +44,14 @@ public class AbClient {
     private WishListCategory wishListCategory;
 
     // getters & setters
+
+    public SellCategory getSellCategory() {
+        return sellCategory;
+    }
+
+    public void setSellCategory(SellCategory sellCategory) {
+        this.sellCategory = sellCategory;
+    }
 
     public WishListCategory getWishListCategory() {
         return wishListCategory;

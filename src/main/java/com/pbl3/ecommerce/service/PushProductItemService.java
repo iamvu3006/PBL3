@@ -44,17 +44,20 @@ public class PushProductItemService {
     }
 
     @Transactional
-    public ProductItem createProductItem(PushProductItemDTO dto) throws Exception {
+    public ProductItem createProductItem(PushProductItemDTO dto, String username) throws Exception {
         // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Lấy tên đăng nhập
 
         AbClient client = clientRepository.findByClientUseName(username)
                 .orElseThrow(() -> new Exception("Không tìm thấy client với username: " + username));
         item.setAbclient(client);
 
+        //Tim sellcategory cua nguoi dung hien tai
+        SellCategory sc = sellCategoryRepository.findByClient(client);
+        if (sc == null) {
+            throw new Exception("User không có danh mục bán hàng. Vui lòng liên hệ admin");
+        }
+        item.setSellCategory(sc);
         // Set basic properties
 
         item.setColor(dto.getColorName());
