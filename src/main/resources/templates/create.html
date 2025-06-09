@@ -369,6 +369,38 @@ document.getElementById('createProductForm').addEventListener('submit', async fu
     
     loadingIndicator.style.display = 'block';
     form.style.display = 'none';
+
+    try {
+        // Chuyển đổi form data thành object
+        const formData = new FormData(form);
+        const formDataObject = {};
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formDataObject)
+        });
+
+        if (response.ok) {
+            // Nếu đăng tin thành công, chuyển hướng về trang chủ
+            window.location.href = '/'; // Đường dẫn tới trang chủ
+        } else {
+            // Nếu có lỗi, hiển thị lại form
+            loadingIndicator.style.display = 'none';
+            form.style.display = 'block';
+            alert('Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        loadingIndicator.style.display = 'none';
+        form.style.display = 'block';
+        alert('Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.');
+    }
 });
 
 // Xử lý các select boxes tùy chỉnh
@@ -398,7 +430,9 @@ document.addEventListener('DOMContentLoaded', function () {
         ['version', 'customVersion'],
         ['colorSelect', 'colorName'],
         ['productRam', 'customRamInput'],
-        ['internalMemory', 'customRom']
+        ['internalMemory', 'customRom'],
+        ['configurationHardDrive', 'customHDD'],
+        ['inchs', 'customScreen']
     ];
 
     customInputPairs.forEach(([selectId, inputId]) => {

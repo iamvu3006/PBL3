@@ -70,6 +70,9 @@ public class ProductItem {
     @OneToMany(mappedBy = "productItem")
     private List<ProductItemCategory> productItemCategories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "productItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImage> images = new ArrayList<>();
+
     // Getters & Setters
 
     public enum Status{
@@ -218,5 +221,14 @@ public class ProductItem {
 
     public void setAbclient(AbClient abclient) {
         this.abclient = abclient;
+    }
+
+    // Thêm getter và setter cho images
+    public List<ProductImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ProductImage> images) {
+        this.images = images;
     }
 }

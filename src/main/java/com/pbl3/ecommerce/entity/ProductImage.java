@@ -3,19 +3,23 @@ package com.pbl3.ecommerce.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity @Table(name = "product_images")
 public class ProductImage {
-  @Id @GeneratedValue
-  private Long id;
-  private String url;
-  @ManyToOne(fetch=FetchType.LAZY)
-  private Product product;
-  // getters/setters
+    @Id 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String url;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ProductItem productItem;
 
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -32,11 +36,11 @@ public class ProductImage {
         this.url = url;
     }
 
-    public Product getProduct() {
-        return product;
+    public ProductItem getProductItem() {
+        return productItem;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductItem(ProductItem productItem) {
+        this.productItem = productItem;
     }
 }
