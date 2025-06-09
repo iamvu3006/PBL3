@@ -1,4 +1,5 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -31,6 +32,7 @@ public class AbClient {
     private String clientAdress;
 
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private SellCategory sellCategory;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
