@@ -1,182 +1,65 @@
+<!-- src/main/resources/templates/wishlist.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Wishlist của tôi</title>
-  <link rel="stylesheet" href="@{/css/style.css}">
-  <link rel="stylesheet" th:href="@{/css/layout.css}">
-  <style>
-    /* Bảng wishlist */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-    th, td {
-      padding: 0.6rem;
-      border-bottom: 1px solid #ddd;
-    }
-    th {
-      background: var(--secondary-color);
-      color: #fff;
-    }
-    button {
-      padding: 0.4rem 0.8rem;
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    button.add-btn {
-      background: var(--secondary-color);
-      color: #fff;
-    }
-    button.add-btn:hover {
-      background: var(--primary-color);
-    }
-    button.delete-btn {
-      background: var(--accent-color);
-      color: #fff;
-    }
-    button.delete-btn:hover {
-      opacity: 0.9;
-    }
-    #message {
-      margin-top: 1rem;
-      padding: 0.6rem;
-      border-radius: var(--border-radius);
-      font-weight: 500;
-      transition: var(--transition);
-    }
-    #message.success {
-      background: var(--success-color);
-      color: #fff;
-    }
-    #message.error {
-      background: var(--accent-color);
-      color: #fff;
-    }
-  </style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Wishlist của tôi</title>
+    <!-- CSS chung + header/footer -->
 
-  <h1>Wishlist của tôi</h1>
+    <link rel="stylesheet" th:href="@{/css/header.css}" />
+    <link rel="stylesheet" th:href="@{/css/styles.css}" />
+ <link rel="stylesheet" th:href="@{/css/wishlist.css}" />
+<link rel="stylesheet" th:href="@{/css/footer.css}" />
+ <link rel="stylesheet" 
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  </head>
+  <body>
+    <!-- include header -->
+    <div th:insert="fragments/header :: siteHeader"></div>
 
-  <!-- Form thêm sản phẩm -->
-  <form id="addForm">
-    <label>
-      Product ID:
-      <input type="number" id="productId" required />
-    </label>
-    <button type="submit" class="add-btn">Thêm vào yêu thích</button>
-  </form>
+    <div class="page-container">
+      <h1 class="section-title">Wishlist của tôi</h1>
 
-  <div id="message"></div>
+      <div th:if="${#lists.isEmpty(favoriteProducts)}" class="empty-state">
+        Bạn chưa có sản phẩm nào trong wishlist.
+      </div>
 
-  <!-- Bảng danh sách yêu thích -->
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Tên sản phẩm</th>
-        <th>Giá</th>
-        <th>Hành động</th>
-      </tr>
-    </thead>
-    <tbody id="wishlistBody">
-      <!-- JS sẽ render ra đây -->
-    </tbody>
-  </table>
-
-  <script th:inline="javascript">
-    /*<![CDATA[*/
-    const clientId   = /*[[${clientId}]]*/ 0;
-    const wishListId = /*[[${wishListId}]]*/ 0;
-
-    // REST endpoints bạn đã cung cấp
-    const listUrl   = /*[[@{/api/wishlist/list}]]*/ '/api/wishlist/list' + '?clientId=' + clientId;
-    const addUrl    = /*[[@{/api/wishlist/add}]]*/ '/api/wishlist/add';
-    const deleteUrl = /*[[@{/api/wishlist/delete}]]*/ '/api/wishlist/delete';
-
-    const msgEl  = document.getElementById('message');
-    const tbody  = document.getElementById('wishlistBody');
-    const addForm = document.getElementById('addForm');
-
-    // Hiển thị message
-    function showMessage(text, type) {
-      msgEl.textContent = text;
-      msgEl.className = type;
-      setTimeout(() => { msgEl.textContent = ''; }, 5000);
-    }
-
-    // Load danh sách wishlist
-    function loadWishlist() {
-      fetch(listUrl)
-        .then(res => {
-          if (!res.ok) throw new Error('Không tải được wishlist: ' + res.status);
-          return res.json();
-        })
-        .then(items => {
-          tbody.innerHTML = '';
-          items.forEach(u => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${u.productItemId}</td>
-              <td>${u.productName}</td>
-              <td>${u.productPrice}</td>
-              <td>
-                <button class="delete-btn" data-product="${u.productItemId}">
-                  Xóa
+      <table th:if="${!#lists.isEmpty(favoriteProducts)}" class="wishlist-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Hình</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="item : ${favoriteProducts}">
+            <td th:text="${item.productItemId}">1</td>
+            <td>
+              <img th:src="@{${item.imageUrl}}" alt="" class="wishlist-img"/>
+            </td>
+            <td th:text="${item.productName}">Tên SP</td>
+            <td th:text="${#numbers.formatDecimal(item.productPrice,0,'.',',')} + '₫'">
+              100.000₫
+            </td>
+            <td>
+              <form th:action="@{/api/wishlist/delete}" method="delete"
+                    th:onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                <input type="hidden" name="wishListId" th:value="${item.wishListId}" />
+                <input type="hidden" name="productId" th:value="${item.productItemId}" />
+                <button type="submit" class="btn btn-warning">
+                  <i class="fas fa-trash-alt"></i> Xóa
                 </button>
-              </td>`;
-            tbody.appendChild(tr);
-          });
-          // Gắn sự kiện xóa
-          tbody.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-              const prodId = btn.dataset.product;
-              if (confirm('Xác nhận xóa sản phẩm #' + prodId + '?')) {
-                deleteWishlist(prodId);
-              }
-            });
-          });
-        })
-        .catch(err => showMessage(err.message, 'error'));
-    }
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    // Thêm sản phẩm vào wishlist
-    addForm.addEventListener('submit', e => {
-      e.preventDefault();
-      const pid = document.getElementById('productId').value;
-      fetch(`${addUrl}?wishListId=${wishListId}&productId=${pid}`, {
-        method: 'POST'
-      })
-      .then(res => res.text())
-      .then(txt => {
-        showMessage(txt, 'success');
-        addForm.reset();
-        loadWishlist();
-      })
-      .catch(err => showMessage(err.message, 'error'));
-    });
-
-    // Xóa sản phẩm khỏi wishlist
-    function deleteWishlist(productId) {
-      fetch(`${deleteUrl}?wishListId=${wishListId}&productId=${productId}`, {
-        method: 'DELETE'
-      })
-      .then(res => res.text())
-      .then(txt => {
-        showMessage(txt, 'success');
-        loadWishlist();
-      })
-      .catch(err => showMessage(err.message, 'error'));
-    }
-
-    // Khởi chạy
-    loadWishlist();
-    /*]]>*/
-  </script>
-
-</body>
+    <!-- include footer -->
+    <div th:insert="fragments/footer :: siteFooter"></div>
+  </body>
 </html>

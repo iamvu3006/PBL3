@@ -1,0 +1,93 @@
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+    --light-color: #ecf0f1;
+    --dark-color: #2c3e50;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+/* Flex container dọc */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.6rem;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: var(--secondary-color);
+      color: #fff;
+    }
+    button {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    button.add-btn {
+      background: var(--secondary-color);
+      color: #fff;
+    }
+    button.add-btn:hover {
+      background: var(--primary-color);
+    }
+    button.delete-btn {
+      background: var(--accent-color);
+      color: #fff;
+    }
+    button.delete-btn:hover {
+      opacity: 0.9;
+    }
+    #message {
+      margin-top: 1rem;
+      padding: 0.6rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    #message.success {
+      background: var(--success-color);
+      color: #fff;
+    }
+    #message.error {
+      background: var(--accent-color);
+      color: #fff;
+    }
+    .wishlist-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.wishlist-table th, .wishlist-table td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+.wishlist-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+}
+.empty-state {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}

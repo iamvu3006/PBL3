@@ -507,6 +507,40 @@
   font-size: 0.8rem;
   margin-left: 4px;
 }
+.btn-wishlist {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.8);
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-wishlist:hover {
+  background: rgba(255,255,255,1);
+}
+.btn-wishlist i {
+  color: var(--accent-color);
+  font-size: 1.2rem;
+}
+
+/* Toast message */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--secondary-color);
+  color: #fff;
+  padding: 0.8rem 1.2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  opacity: 0.9;
+  z-index: 10000;
+}
+
     </style>
 </head>
 <body>
@@ -577,9 +611,21 @@
 <main class="container">
     <section>
         <h2 class="section-title">Tin đăng mới nhất</h2>
-        <div class="product-grid" id="product-list">
-            <!-- Products will be loaded here -->
-        </div>
+       <div class="product-grid">
+  <div th:each="item : ${products}" class="product-card">
+    <img th:src="@{${item.imageUrl}}" alt="" class="product-image"/>
+    <div class="product-info">
+      <h4 th:text="${item.title}"></h4>
+      <p class="product-price" th:text="${item.price} + '₫'"></p>
+    </div>
+    <!-- Nút Yêu thích -->
+    <button class="btn btn-wishlist"
+            th:data-productId="${item.id}"
+            title="Thêm vào yêu thích">
+      <i class="far fa-heart"></i>
+    </button>
+  </div>
+</div>
     </section>
 
     <section style="margin-top: 60px;">
@@ -839,6 +885,41 @@
 
         displayProducts();
     });
+    
 </script>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+    const wishListId = /*[[${wishListId}]]*/ 0;
+    const addUrl     = /*[[@{/api/wishlist/add}]]*/ '/api/wishlist/add';
+  /*]]>*/
+</script>
+<script>
+  document.querySelectorAll('.btn-wishlist').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pid = btn.dataset.productid;
+      fetch(`${addUrl}?wishListId=${wishListId}&productId=${pid}`, {
+        method: 'POST'
+      })
+      .then(r => {
+        if (!r.ok) throw new Error('Status ' + r.status);
+        return r.text();
+      })
+      .then(msg => {
+        // đổi icon sang filled heart
+        btn.innerHTML = '<i class="fas fa-heart"></i>';
+        // show thông báo nhỏ
+        const tip = document.createElement('div');
+        tip.textContent = msg;
+        tip.className = 'toast';
+        document.body.append(tip);
+        setTimeout(() => tip.remove(), 2500);
+      })
+      .catch(err => {
+        alert('Lỗi: ' + err.message);
+      });
+    });
+  });
+</script>
+
 </body>
 </html>

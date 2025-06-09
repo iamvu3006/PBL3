@@ -15,7 +15,6 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -46,10 +45,9 @@ header {
 /* Dropdown wrapper */
 .user-nav {
   position: relative;
-  display: inline-block;
 }
 
-/* Toggle */
+/* Toggle button/link */
 .dropdown-toggle {
   cursor: pointer;
   display: flex;
@@ -64,7 +62,7 @@ header {
   background-color: var(--light-color);
 }
 
-/* Menu */
+/* Dropdown menu */
 .dropdown-menu {
   display: none;
   position: absolute;
@@ -81,12 +79,12 @@ header {
   display: block;
 }
 
-/* Items */
+/* Menu items */
 .dropdown-item {
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  color: var(--dark-color);
+  color: #333;
   text-decoration: none;
   transition: var(--transition);
 }
@@ -97,17 +95,19 @@ header {
   background-color: var(--light-color);
 }
 
-/* Headers & dividers */
+/* Divider */
+.dropdown-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: #eee;
+}
+
+/* Group header inside dropdown */
 .dropdown-header {
   padding: 8px 16px;
   font-size: 0.85rem;
   color: #777;
   text-transform: uppercase;
-}
-.dropdown-menu hr {
-  margin: 4px 0;
-  border: none;
-  border-top: 1px solid #eee;
 }
 
 /* Small arrow icon */
