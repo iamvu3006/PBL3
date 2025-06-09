@@ -55,12 +55,7 @@ public class PushProductItemService {
         //Tim sellcategory cua nguoi dung hien tai
         SellCategory sc = sellCategoryRepository.findByClient(client);
         if (sc == null) {
-            // Nếu chưa có thì tạo mới (dự phòng)
-            sc = new SellCategory();
-            sc.setClient(client);
-            sc = sellCategoryRepository.save(sc);
-            client.setSellCategory(sc);
-            clientRepository.save(client);
+            throw new Exception("User không có danh mục bán hàng. Vui lòng liên hệ admin");
         }
         item.setSellCategory(sc);
         // Set basic properties
