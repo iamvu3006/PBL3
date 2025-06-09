@@ -5,6 +5,7 @@ public class AuthResponse {
     private String message;
     private Integer clientId;
     private String username;
+     private String role;   
 
     // Constructors
     public AuthResponse() {
@@ -20,6 +21,17 @@ public class AuthResponse {
         this.message = message;
         this.clientId = clientId;
         this.username = username;
+    }
+    public AuthResponse(boolean success,
+                        String message,
+                        Integer clientId,
+                        String username,
+                        String role) {
+        this.success = success;
+        this.message = message;
+        this.clientId = clientId;
+        this.username = username;
+        this.role = role;
     }
 
     // Getters and Setters
@@ -57,5 +69,13 @@ public class AuthResponse {
 
     public String getEmail() {
         return "";
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
