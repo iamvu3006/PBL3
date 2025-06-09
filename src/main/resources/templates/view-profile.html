@@ -3,35 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>Hồ sơ cá nhân</title>
- 
+  <!-- CSS của bạn -->
   <link rel="stylesheet" th:href="@{/css/view-profile.css}" />
+  <!-- Font Awesome để hiển thị icon sao -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 </head>
 <body>
   <div class="page-container">
-    
-
     <main class="profile-page">
+
+      <!-- Profile Card -->
       <section class="profile-card" th:object="${clientDTO}">
         <h2 class="profile-title">Hồ sơ cá nhân</h2>
 
-       <div class="profile-info">
-  <div class="info-item">
-    <div class="label">Họ và tên</div>
-    <div class="value" th:text="*{clientFullName}"></div>
-  </div>
-  <div class="info-item">
-    <div class="label">Email</div>
-    <div class="value" th:text="*{clientEmailAdress}"></div>
-  </div>
-  <div class="info-item">
-    <div class="label">Điện thoại</div>
-    <div class="value" th:text="*{clientPhoneNumber}"></div>
-  </div>
-  <div class="info-item">
-    <div class="label">Địa chỉ</div>
-    <div class="value" th:text="*{clientAdress}"></div>
-  </div>
-</div>
+        <div class="profile-info">
+          <div class="info-item">
+            <div class="label">Họ và tên</div>
+            <div class="value" th:text="*{clientFullName}"></div>
+          </div>
+          <div class="info-item">
+            <div class="label">Email</div>
+            <div class="value" th:text="*{clientEmailAdress}"></div>
+          </div>
+          <div class="info-item">
+            <div class="label">Điện thoại</div>
+            <div class="value" th:text="*{clientPhoneNumber}"></div>
+          </div>
+          <div class="info-item">
+            <div class="label">Địa chỉ</div>
+            <div class="value" th:text="*{clientAdress}"></div>
+          </div>
+        </div>
 
         <div class="profile-actions">
           <a th:href="@{/profile/edit}" class="btn btn-primary">
@@ -43,9 +45,28 @@
           <i class="fas fa-check-circle"></i> Cập nhật thành công!
         </div>
       </section>
-    </main>
 
-    
+      <!-- Feedback Section -->
+      <section class="feedback-section" th:if="${feedbackData.feedbackList}">
+        <h3>Nhận xét từ người dùng</h3>
+        <ul class="feedback-list">
+          <li th:each="fb : ${feedbackData.feedbackList}">
+            <div class="feedback-item">
+              <div class="feedback-rating">
+                <!-- sao vàng -->
+                <i class="fas fa-star" 
+                   th:each="n : ${#numbers.sequence(1, fb.rate)}"></i>
+                <!-- sao xám -->
+                <i class="fas fa-star empty" 
+                   th:each="n : ${#numbers.sequence(fb.rate + 1, 5)}"></i>
+              </div>
+              <p class="feedback-comment" th:text="${fb.clientComment}">...</p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+    </main>
   </div>
 </body>
 </html>
