@@ -2,16 +2,16 @@ package com.pbl3.ecommerce.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "sellcategoryid")
+@Table(name = "sellcategory")
 public class SellCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JoinColumn(name = "sell_categoryid")
+    @Column(name = "sell_categoryid")
     private Integer sellCategoryID;
 
-    @ManyToOne
-    @JoinColumn(name = "clientid")
+    @OneToOne
+    @JoinColumn(name = "clientid", unique = true) // Thêm ràng buộc unique
     private AbClient client;
 
     // Getters and setters
