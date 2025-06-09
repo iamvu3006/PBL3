@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pbl3.ecommerce.entity.SellCategory;
+import com.pbl3.ecommerce.repository.SellCategoryRepository;
 import com.pbl3.ecommerce.dto.AuthResponse;
 import com.pbl3.ecommerce.dto.ClientDTO;
 import com.pbl3.ecommerce.dto.LoginRequest;
