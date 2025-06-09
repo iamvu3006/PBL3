@@ -1,4 +1,5 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,7 +12,8 @@ public class SellCategory {
     private Integer sellCategoryID;
 
     @OneToOne
-    @JoinColumn(name = "clientid", unique = true) // Thêm ràng buộc unique
+    @JoinColumn(name = "clientid", unique = true)
+    @JsonBackReference// Thêm ràng buộc unique
     private AbClient client;
 
     // Getters and setters
