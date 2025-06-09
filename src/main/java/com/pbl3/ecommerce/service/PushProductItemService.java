@@ -48,12 +48,20 @@ public class PushProductItemService {
         // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName(); // Lấy tên đăng nhập
-
         AbClient client = clientRepository.findByClientUseName(username)
                 .orElseThrow(() -> new Exception("Không tìm thấy client với username: " + username));
         item.setAbclient(client);
+
+        //Tim sellcategory cua nguoi dung hien tai
+        SellCategory sc = sellCategoryRepository.findByClient(client);
+        if (sc == null) {
+            // Nếu chưa có thì tạo mới (dự phòng)
+            sc = new SellCategory();
+            sc.setClient(client);
+            sc = sellCategoryRepository.save(sc);
+            client.setSellCategory(sc);
+            clientRepository.save(client);
+        }
 
         // Set basic properties
 
