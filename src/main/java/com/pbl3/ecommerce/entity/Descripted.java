@@ -25,6 +25,7 @@ public class Descripted {
     private String Descripted;
 
     @OneToOne(mappedBy = "descripted")
+    @JsonIgnore
     private ProductItem productItem;
 
     // getters & setters
