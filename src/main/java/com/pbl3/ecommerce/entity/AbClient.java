@@ -33,7 +33,6 @@ public class AbClient {
     private String clientAdress;
 
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
-    @JsonIgnore
     private SellCategory sellCategory;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
@@ -42,7 +41,7 @@ public class AbClient {
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "wishlistid")
-    @JsonIgnore
+    @JsonManagedReference
     private WishListCategory wishListCategory;
 
     // getters & setters
