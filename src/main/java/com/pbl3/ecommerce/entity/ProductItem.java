@@ -1,5 +1,6 @@
 package com.pbl3.ecommerce.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class ProductItem {
 
     @ManyToOne
     @JoinColumn(name = "clientid")
+    @JsonIgnore
     private AbClient abclient;
 
     @Column(name = "price")
@@ -61,17 +63,16 @@ public class ProductItem {
 
     @ManyToOne
     @JoinColumn(name = "sell_categoryid")
+    @JsonIgnore
     private SellCategory SellCategory;
 
     @OneToOne(cascade = CascadeType.PERSIST) //Luu du luu cua descripted roi moi luu productitem
     @JoinColumn(name = "describeid")
     private Descripted descripted;
 
+
     @OneToMany(mappedBy = "productItem")
     private List<ProductItemCategory> productItemCategories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "productItem", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImage> images = new ArrayList<>();
 
     // Getters & Setters
 
@@ -221,14 +222,5 @@ public class ProductItem {
 
     public void setAbclient(AbClient abclient) {
         this.abclient = abclient;
-    }
-
-    // Thêm getter và setter cho images
-    public List<ProductImage> getImages() {
-        return images;
-    }
-
-    public void setImages(List<ProductImage> images) {
-        this.images = images;
     }
 }
