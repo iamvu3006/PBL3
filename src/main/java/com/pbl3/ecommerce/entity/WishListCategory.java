@@ -1,4 +1,6 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,6 +12,7 @@ public class WishListCategory {
     private Integer wishListID;
 
     @OneToOne(mappedBy = "wishListCategory", optional = false)
+    @JsonIgnore
     private AbClient abClient;
     // Getters and setters
 
