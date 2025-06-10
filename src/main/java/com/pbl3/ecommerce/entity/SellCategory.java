@@ -14,7 +14,7 @@ public class SellCategory {
 
     @OneToOne
     @JoinColumn(name = "clientid", unique = true)
-    @JsonIgnore
+    @JsonBackReference("client-sellcategory")
     private AbClient client;
 
     // Getters and setters
