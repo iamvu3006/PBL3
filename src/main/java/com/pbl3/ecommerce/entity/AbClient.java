@@ -33,6 +33,7 @@ public class AbClient {
     private String clientAdress;
 
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
+    @JsonManagedReference("client-sellcategory")
     private SellCategory sellCategory;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
@@ -41,7 +42,7 @@ public class AbClient {
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "wishlistid")
-    @JsonManagedReference
+    @JsonManagedReference("client-wishlist")
     private WishListCategory wishListCategory;
 
     // getters & setters
