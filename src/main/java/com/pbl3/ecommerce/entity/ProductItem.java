@@ -68,12 +68,10 @@ public class ProductItem {
 
     @OneToOne(cascade = CascadeType.PERSIST) //Luu du luu cua descripted roi moi luu productitem
     @JoinColumn(name = "describeid")
-    @JsonIgnore
     private Descripted descripted;
 
 
     @OneToMany(mappedBy = "productItem")
-    @JsonIgnore
     private List<ProductItemCategory> productItemCategories = new ArrayList<>();
 
     // Getters & Setters

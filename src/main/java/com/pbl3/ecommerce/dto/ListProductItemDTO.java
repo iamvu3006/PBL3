@@ -38,6 +38,7 @@ public class ListProductItemDTO {
                 if(item.getNormalDescribe() != null){
                     this.normalDescribe = item.getNormalDescribe();
                 } else{
+                    this.normalDescribe = "Chưa có mô tả"; // Gán giá trị mặc định
                     logger.warn("Mo ta don gian khong co tai san pham co if: {}", item.getProductItemId());
                 }
 

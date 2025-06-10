@@ -108,7 +108,7 @@ public class PushProductItemService {
         }
 
         // Set sell category relationship with proper error handling
-        SellCategory sc = sellCategoryRepository.findById(dto.getSellCategoryId())
+        SellCategory scr = sellCategoryRepository.findById(dto.getSellCategoryId())
                 .orElseThrow(() -> new Exception("khong tim thay idsell tuong ung: " + dto.getSellCategoryId() + "tai id khach hang la" + item.getAbClient().getClientID()));
         item.setSellCategory(sc);
 

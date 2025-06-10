@@ -1,6 +1,5 @@
 package com.pbl3.ecommerce.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
@@ -33,16 +32,15 @@ public class AbClient {
     private String clientAdress;
 
     @OneToOne(mappedBy = "client", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonManagedReference
     private SellCategory sellCategory;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<ProductCategoryClient> productCategoryClients = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "wishlistid")
-    @JsonIgnore
+    @JsonManagedReference                   //danh dau phia chu cau tham chieu
     private WishListCategory wishListCategory;
 
     // getters & setters

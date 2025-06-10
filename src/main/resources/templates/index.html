@@ -609,26 +609,13 @@
     </div>
 </header>
 
-<main class="container">
-    <section>
-        <h2 class="section-title">Tin đăng mới nhất</h2>
-       <div class="product-grid">
-  <div th:each="item : ${products}" class="product-card">
-    <img th:src="@{${item.imageUrl}}" alt="" class="product-image"/>
-    <div class="product-info">
-      <h4 th:text="${item.title}"></h4>
-      <p class="product-price" th:text="${item.price} + '₫'"></p>
+<main>
+    <div class="container">
+        <h2 class="section-title">Sản Phẩm Mới Nhất</h2>
+        <div class="product-grid" id="productGrid">
+            <!-- Products will be loaded here -->
+        </div>
     </div>
-    <!-- Nút Yêu thích -->
-    <button class="btn btn-wishlist"
-            th:data-productId="${item.id}"
-            title="Thêm vào yêu thích">
-      <i class="far fa-heart"></i>
-    </button>
-  </div>
-</div>
-    </section>
-
 </main>
 
 <footer>
@@ -913,5 +900,52 @@
   });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadProducts();
+});
+
+function loadProducts() {
+    fetch('/api/productitems')
+        .then(response => response.json())
+        .then(products => {
+            const productGrid = document.querySelector('.product-grid');
+            productGrid.innerHTML = ''; // Xóa nội dung cũ
+            
+            products.forEach(product => {
+                const productCard = `
+                    <div class="product-card">
+                        <img src="${product.imageUrl || 'https://cdn.chotot.com/IW_UuMfpjxpHh3Jci_-Qv73prueMtU1Zq0rTupNPWK8/preset:view/plain/f3fe27b478df01b2d4925e5b34d068a1-2935106896069021223.jpg'}"
+                             alt="${product.name}" 
+                             class="product-image">
+                        <div class="product-info">
+                            <h3 class="product-title">${product.name}</h3>
+                            <div class="product-price">${formatPrice(product.price)}₫</div>
+                            <div class="product-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${product.location || 'Chưa cập nhật'}</span>
+                            </div>
+                            <div class="product-actions">
+                                <a th:href="product_detail" class="btn btn-primary">
+                                    <i class="fas fa-info-circle"></i> Chi tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                productGrid.innerHTML += productCard;
+            });
+        })
+        .catch(error => {
+            console.error('Lỗi khi tải sản phẩm:', error);
+            const productGrid = document.querySelector('.product-grid');
+            productGrid.innerHTML = '<p class="error-message">Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.</p>';
+        });
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('vi-VN').format(price);
+}
+</script>
 </body>
 </html>

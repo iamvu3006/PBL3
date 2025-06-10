@@ -374,8 +374,26 @@ document.getElementById('createProductForm').addEventListener('submit', async fu
         // Chuyển đổi form data thành object
         const formData = new FormData(form);
         const formDataObject = {};
+        
         formData.forEach((value, key) => {
-            formDataObject[key] = value;
+            // Ép kiểu RAM
+            if (key === 'productRam') {
+                const ramValue = document.getElementById('customRamInput').style.display === 'block' 
+                    ? document.getElementById('customRamInput').value 
+                    : value;
+                formDataObject[key] = parseInt(ramValue) || 0;
+            }
+            // Ép kiểu ROM
+            else if (key === 'internalMemory') {
+                const romValue = document.getElementById('customRom').style.display === 'block'
+                    ? document.getElementById('customRom').value
+                    : value;
+                formDataObject[key] = parseInt(romValue) || 0;
+            }
+            // Các trường khác giữ nguyên
+            else {
+                formDataObject[key] = value;
+            }
         });
 
         const response = await fetch(form.action, {
@@ -387,10 +405,8 @@ document.getElementById('createProductForm').addEventListener('submit', async fu
         });
 
         if (response.ok) {
-            // Nếu đăng tin thành công, chuyển hướng về trang chủ
-            window.location.href = '/'; // Đường dẫn tới trang chủ
+            window.location.href = '/';
         } else {
-            // Nếu có lỗi, hiển thị lại form
             loadingIndicator.style.display = 'none';
             form.style.display = 'block';
             alert('Có lỗi xảy ra khi đăng tin. Vui lòng thử lại.');
