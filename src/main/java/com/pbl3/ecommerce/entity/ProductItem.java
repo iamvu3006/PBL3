@@ -51,14 +51,17 @@ public class ProductItem {
 
     @ManyToOne
     @JoinColumn(name = "versionid")
+    @JsonIgnore
     private AbVersion version;
 
     @ManyToOne
     @JoinColumn(name = "brand")
+    @JsonIgnore
     private Brand Brandid;
 
     @ManyToOne
     @JoinColumn(name = "tariffi_packageid")
+    @JsonIgnore
     private TariffiPackage TariffiPackage;
 
     @ManyToOne
@@ -68,7 +71,6 @@ public class ProductItem {
 
     @OneToOne(cascade = CascadeType.PERSIST) //Luu du luu cua descripted roi moi luu productitem
     @JoinColumn(name = "describeid")
-    @JsonIgnore
     private Descripted descripted;
 
 
