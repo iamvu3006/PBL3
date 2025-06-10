@@ -1,4 +1,6 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,9 +13,11 @@ public class AbVersion {
 
     @ManyToOne
     @JoinColumn(name = "brandid")
+    @JsonBackReference
     private Brand brand;
 
     // getters & setters
+
 
     public Integer getVersionID() {
         return versionID;
