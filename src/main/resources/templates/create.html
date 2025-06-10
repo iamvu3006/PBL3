@@ -211,7 +211,9 @@
                                 th:value="${brand.brandName}"
                                 th:text="${brand.brandName}">
                         </option>
+                        <option value="Khác">Khác</option>
                     </select>
+                    <input type="text" class="form-control mt-2" id="customBrand" name="customBrand" placeholder="Nhập thương hiệu khác" style="display:none;" />
                     <div class="error-message" id="brandNameError"></div>
                 </div>
             </div>
@@ -291,6 +293,7 @@
                         <option value="SSD">SSD</option>
                         <option value="HDD">HDD</option>
                         <option value="SSHD">SSHD</option>
+                        <option value="Không">SSD</option>
                         <option value="Khác">Khác</option>
                     </select>
                     <input type="text" class="form-control mt-2" id="customHDD" name="customHDD" placeholder="Nhập loại ổ cứng khác" style="display:none;" />
@@ -419,16 +422,22 @@ document.getElementById('createProductForm').addEventListener('submit', async fu
     }
 });
 
-// Xử lý các select boxes tùy chỉnh
 document.addEventListener('DOMContentLoaded', function () {
     // Xử lý version select khi brand thay đổi
     document.getElementById('brandName').addEventListener('change', function () {
         const brandName = this.value;
-        if (brandName) {
+        const versionSelect = document.getElementById('version');
+        const customBrandInput = document.getElementById('customBrand');
+        
+        // Xử lý hiển thị input customBrand
+        customBrandInput.style.display = brandName === 'Khác' ? 'block' : 'none';
+        customBrandInput.required = brandName === 'Khác';
+
+        if (brandName && brandName !== 'Khác') {
+            // Load versions từ API khi chọn thương hiệu cụ thể
             fetch(`/api/brands/${encodeURIComponent(brandName)}/versions`)
                 .then(response => response.json())
                 .then(versions => {
-                    const versionSelect = document.getElementById('version');
                     versionSelect.innerHTML = '<option value="">Chọn phiên bản</option>';
                     versions.forEach(version => {
                         const option = document.createElement('option');
@@ -436,13 +445,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         option.textContent = version.versionName;
                         versionSelect.appendChild(option);
                     });
+                    // Thêm option "Khác" vào cuối danh sách
+                    const otherOption = document.createElement('option');
+                    otherOption.value = 'Khác';
+                    otherOption.textContent = 'Khác';
+                    versionSelect.appendChild(otherOption);
                 })
                 .catch(error => console.error('Error loading versions:', error));
+        } else {
+            // Reset version select và thêm option "Khác"
+            versionSelect.innerHTML = `
+                <option value="">Chọn phiên bản</option>
+                <option value="Khác">Khác</option>
+            `;
         }
     });
 
     // Xử lý hiển thị input tùy chỉnh
     const customInputPairs = [
+        ['brandName', 'customBrand'],
         ['version', 'customVersion'],
         ['colorSelect', 'colorName'],
         ['productRam', 'customRamInput'],
