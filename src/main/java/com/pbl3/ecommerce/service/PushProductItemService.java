@@ -16,6 +16,7 @@ public class PushProductItemService {
     private final BrandRepository brandRepository;
     private final TariffiPackageRepository tariffiPackageRepository;
     private final SellCategoryRepository sellCategoryRepository;
+    private final VersionRepository versionRepository; // FIX: Thêm repository cho Version
 
     @Autowired
     public PushProductItemService(
@@ -23,12 +24,14 @@ public class PushProductItemService {
             AbClientRepository clientRepository,
             BrandRepository brandRepository,
             TariffiPackageRepository tariffiPackageRepository,
-            SellCategoryRepository sellCategoryRepository) {
+            SellCategoryRepository sellCategoryRepository,
+            VersionRepository versionRepository) { // FIX: Inject versionRepository
         this.productItemRepository = productItemRepository;
         this.clientRepository = clientRepository;
         this.brandRepository = brandRepository;
         this.tariffiPackageRepository = tariffiPackageRepository;
         this.sellCategoryRepository = sellCategoryRepository;
+        this.versionRepository = versionRepository;
     }
 
     @Transactional
@@ -36,30 +39,30 @@ public class PushProductItemService {
         // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
 
-        // Thay thế đoạn authentication bằng username từ tham số
+        // Find client
         AbClient client = clientRepository.findByClientUseName(username)
                 .orElseThrow(() -> new Exception("Không tìm thấy client với username: " + username));
         item.setAbclient(client);
 
-        //Tim sellcategory cua nguoi dung hien tai
+        // Find sell category
         SellCategory sc = sellCategoryRepository.findByClient(client);
         if (sc == null) {
             throw new Exception("User không có danh mục bán hàng. Vui lòng liên hệ admin");
         }
         item.setSellCategory(sc);
-        // Set basic properties
 
+        // Set basic properties
+        item.setPrice(dto.getPrice()); // FIX: Thêm dòng này
         item.setColor(dto.getColorName());
         item.setRam(dto.getProductRam());
         item.setInchs(dto.getInchs());
         item.setInternalmemory(dto.getInternalMemory());
         item.setHardDriveType(dto.getConfigurationHardDrive());
+        item.setNormalDescribe(dto.getProductName()); // FIX: Nếu có field này trong DTO
 
         // Set product type with validation
-        // Set product type with improved validation
         try {
             String type = dto.getProductType().trim().toUpperCase();
-
             if (type.equals("LAPTOP") || type.equals("PHONE")) {
                 item.setProducttype(ProductItem.ProductType.valueOf(type));
             } else {
@@ -70,31 +73,28 @@ public class PushProductItemService {
             throw e;
         }
 
-        // Set brand relationship with proper error handling
+        // Set brand relationship
         Brand brand = brandRepository.findByBrandName(dto.getBrandName());
         if (brand == null) {
-            throw new Exception("Khong tim thay brand_name: " + dto.getBrandName() +" tai id khach hang la " + item.getAbClient().getClientID());
+            throw new Exception("Không tìm thấy brand_name: " + dto.getBrandName() + " tại id khách hàng là " + client.getClientID());
         }
         item.setBrand(brand);
 
-        AbVersion Version = null;
-
-        for(AbVersion v : brand.getVersions()){
-            if(v.getVersionName().equalsIgnoreCase(dto.getVersion())){
-                Version = v;
-                break;
-            }
+        // FIX: Sử dụng repository thay vì truy cập trực tiếp collection
+        AbVersion version = versionRepository.findByBrandAndVersionName(brand, dto.getVersion());
+        if (version == null) {
+            throw new Exception("Không tìm thấy phiên bản: " + dto.getVersion() + " tại khách hàng id " + client.getClientID());
         }
+        // FIX: Thiếu setter cho version
+        item.setVersion(version); // Cần thêm setter này trong ProductItem entity
 
-        if(Version == null) {
-            throw new Exception("Khong tim thay phien ban:" + dto.getVersion() + "tai khach hang id" + item.getAbClient().getClientID());
-        }
-
-        // Set tariff package relationship with proper error handling
+        // Set tariff package
         TariffiPackage tp = tariffiPackageRepository.findByPackageName(dto.getTafiffPakageName());
         if (tp == null) {
-            throw new Exception("khong tim thay goi cuoc: " + dto.getTafiffPakageName() + "tai id khach hang la" + item.getAbClient().getClientID());
+            throw new Exception("Không tìm thấy gói cước: " + dto.getTafiffPakageName() + " tại id khách hàng là " + client.getClientID());
         }
+        // FIX: Thiếu setter cho TariffiPackage
+        item.setTariffiPackage(tp); // Cần thêm setter này trong ProductItem entity
 
         // Create and populate Descripted entity
         Descripted descripted = new Descripted();
@@ -104,17 +104,22 @@ public class PushProductItemService {
         descripted.setPrice(dto.getPrice());
         descripted.setWarrantyPeriod(dto.getWarranPeriod());
 
-        // Set up bidirectional relationship
-        item.setDescriptedID(descripted); // This will also set the reverse relationship
+        // Set up relationship
+        item.setDescriptedID(descripted);
 
-        // Save the product item (Descripted will be saved via cascade)
+        // Save the product item
         return productItemRepository.save(item);
     }
 
-    // Thêm method để convert entity sang DTO trong service
+    // FIX: Improved DTO conversion with null safety
     public ProductItemResponseDTO convertToResponseDTO(ProductItem productItem) {
+        if (productItem == null) {
+            return null;
+        }
+
         ProductItemResponseDTO dto = new ProductItemResponseDTO();
 
+        // Basic fields
         dto.setProductItemId(productItem.getProductItemId());
         dto.setProductType(productItem.getProducttype() != null ? productItem.getProducttype().toString() : null);
         dto.setStatus(productItem.getStatus() != null ? productItem.getStatus().toString() : null);
@@ -126,49 +131,54 @@ public class PushProductItemService {
         dto.setHardDriveType(productItem.getHardDriveType());
         dto.setNormalDescribe(productItem.getNormalDescribe());
 
-        // Client info
-        if (productItem.getAbclient() != null) {
-            dto.setClientId(productItem.getAbclient().getClientID());
-            dto.setClientUseName(productItem.getAbclient().getClientUseName());
-            dto.setClientFullName(productItem.getAbclient().getClientFullName());
-            dto.setClientPhoneNumber(productItem.getAbclient().getClientPhoneNumber());
+        // FIX: Safe access to client info
+        AbClient client = productItem.getAbclient();
+        if (client != null) {
+            dto.setClientId(client.getClientID());
+            dto.setClientUseName(client.getClientUseName());
+            dto.setClientFullName(client.getClientFullName());
+            dto.setClientPhoneNumber(client.getClientPhoneNumber());
         }
 
-        // Brand info
-        if (productItem.getBrandid() != null) {
-            dto.setBrandId(productItem.getBrandid().getBrandID());
-            dto.setBrandName(productItem.getBrandid().getBrandName());
+        // FIX: Safe access to brand info
+        Brand brand = productItem.getBrandid();
+        if (brand != null) {
+            dto.setBrandId(brand.getBrandID());
+            dto.setBrandName(brand.getBrandName());
         }
 
-        // Version info
-        if (productItem.getVersion() != null) {
-            dto.setVersionId(productItem.getVersion().getVersionID());
-            dto.setVersionName(productItem.getVersion().getVersionName());
+        // FIX: Safe access to version info
+        AbVersion version = productItem.getVersion();
+        if (version != null) {
+            dto.setVersionId(version.getVersionID());
+            dto.setVersionName(version.getVersionName());
         }
 
-        // Tariff Package info
-        if (productItem.getTariffiPackage() != null) {
-            dto.setTariffiPackageId(productItem.getTariffiPackage().getTariffiPackageID());
-            dto.setTariffiPackageName(productItem.getTariffiPackage().getPackageName());
+        // FIX: Safe access to tariff package info
+        TariffiPackage tariffiPackage = productItem.getTariffiPackage();
+        if (tariffiPackage != null) {
+            dto.setTariffiPackageId(tariffiPackage.getTariffiPackageID());
+            dto.setTariffiPackageName(tariffiPackage.getPackageName());
         }
 
-        // Descripted info
-        if (productItem.getDescripted() != null) {
-            dto.setProductName(productItem.getDescripted().getProductName());
-            dto.setDescriptedProduct(productItem.getDescripted().getDescripted());
-            dto.setAddress(productItem.getDescripted().getAddress());
-            dto.setWarrantyPeriod(productItem.getDescripted().getWarrantyPeriod());
+        // FIX: Safe access to descripted info
+        Descripted descripted = productItem.getDescripted();
+        if (descripted != null) {
+            dto.setProductName(descripted.getProductName());
+            dto.setDescriptedProduct(descripted.getDescripted());
+            dto.setAddress(descripted.getAddress());
+            dto.setWarrantyPeriod(descripted.getWarrantyPeriod());
         }
 
-        // SellCategory info
-        if (productItem.getSellCategory() != null) {
-            dto.setSellCategoryId(productItem.getSellCategory().getSellCategoryID());
+        // FIX: Safe access to sell category info
+        SellCategory sellCategory = productItem.getSellCategory();
+        if (sellCategory != null) {
+            dto.setSellCategoryId(sellCategory.getSellCategoryID());
         }
 
         return dto;
     }
 
-    // Method để tạo và trả về DTO thay vì entity
     @Transactional
     public ProductItemResponseDTO createProductItemAndReturnDTO(PushProductItemDTO dto, String username) throws Exception {
         ProductItem savedItem = createProductItem(dto, username);
