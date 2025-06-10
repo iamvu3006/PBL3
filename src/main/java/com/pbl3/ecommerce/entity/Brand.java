@@ -1,4 +1,6 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.*;
 
@@ -11,6 +13,7 @@ public class Brand {
     private String brandName;
 
     @OneToMany(mappedBy = "brand")
+    @JsonManagedReference
     private List<AbVersion> versions;
 
     // getters & setters
