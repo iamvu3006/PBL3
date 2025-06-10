@@ -46,7 +46,7 @@ public class PushProductItemController {
         String username = (String) session.getAttribute("username");
 
         try {
-            productItemService.createProductItem(dto, username); // Truyền username vào
+            ProductItemResponseDTO res = productItemService.createProductItemAndReturnDTO(dto, username); // Truyền username vào
             return ResponseEntity.ok("Đăng bán sản phẩm thành công!");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Lỗi: " + e.getMessage());
