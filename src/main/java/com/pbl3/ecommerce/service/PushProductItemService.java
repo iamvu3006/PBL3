@@ -1,24 +1,12 @@
 package com.pbl3.ecommerce.service;
 
+import com.pbl3.ecommerce.dto.PushProductItemDTO;
+import com.pbl3.ecommerce.dto.ProductItemResponseDTO;
+import com.pbl3.ecommerce.entity.*;
+import com.pbl3.ecommerce.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.pbl3.ecommerce.dto.PushProductItemDTO;
-import com.pbl3.ecommerce.entity.AbClient;
-import com.pbl3.ecommerce.entity.AbVersion;
-import com.pbl3.ecommerce.entity.Brand;
-import com.pbl3.ecommerce.entity.Descripted;
-import com.pbl3.ecommerce.entity.ProductItem;
-import com.pbl3.ecommerce.entity.SellCategory;
-import com.pbl3.ecommerce.entity.TariffiPackage;
-import com.pbl3.ecommerce.repository.AbClientRepository;
-import com.pbl3.ecommerce.repository.BrandRepository;
-import com.pbl3.ecommerce.repository.ProductItemRepository;
-import com.pbl3.ecommerce.repository.SellCategoryRepository;
-import com.pbl3.ecommerce.repository.TariffiPackageRepository;
 
 @Service
 public class PushProductItemService {
@@ -48,6 +36,7 @@ public class PushProductItemService {
         // Create and populate ProductItem entity
         ProductItem item = new ProductItem();
 
+        // Thay thế đoạn authentication bằng username từ tham số
         AbClient client = clientRepository.findByClientUseName(username)
                 .orElseThrow(() -> new Exception("Không tìm thấy client với username: " + username));
         item.setAbclient(client);
@@ -107,11 +96,6 @@ public class PushProductItemService {
             throw new Exception("khong tim thay goi cuoc: " + dto.getTafiffPakageName() + "tai id khach hang la" + item.getAbClient().getClientID());
         }
 
-        // Set sell category relationship with proper error handling
-        SellCategory scr = sellCategoryRepository.findById(dto.getSellCategoryId())
-                .orElseThrow(() -> new Exception("khong tim thay idsell tuong ung: " + dto.getSellCategoryId() + "tai id khach hang la" + item.getAbClient().getClientID()));
-        item.setSellCategory(sc);
-
         // Create and populate Descripted entity
         Descripted descripted = new Descripted();
         descripted.setProductName(dto.getProductName());
@@ -126,7 +110,68 @@ public class PushProductItemService {
         // Save the product item (Descripted will be saved via cascade)
         return productItemRepository.save(item);
     }
-    
-    
-}
 
+    // Thêm method để convert entity sang DTO trong service
+    public ProductItemResponseDTO convertToResponseDTO(ProductItem productItem) {
+        ProductItemResponseDTO dto = new ProductItemResponseDTO();
+
+        dto.setProductItemId(productItem.getProductItemId());
+        dto.setProductType(productItem.getProducttype() != null ? productItem.getProducttype().toString() : null);
+        dto.setStatus(productItem.getStatus() != null ? productItem.getStatus().toString() : null);
+        dto.setPrice(productItem.getPrice());
+        dto.setColor(productItem.getColor());
+        dto.setRam(productItem.getRam());
+        dto.setInchs(productItem.getInchs());
+        dto.setInternalMemory(productItem.getInternalMemory());
+        dto.setHardDriveType(productItem.getHardDriveType());
+        dto.setNormalDescribe(productItem.getNormalDescribe());
+
+        // Client info
+        if (productItem.getAbclient() != null) {
+            dto.setClientId(productItem.getAbclient().getClientID());
+            dto.setClientUseName(productItem.getAbclient().getClientUseName());
+            dto.setClientFullName(productItem.getAbclient().getClientFullName());
+            dto.setClientPhoneNumber(productItem.getAbclient().getClientPhoneNumber());
+        }
+
+        // Brand info
+        if (productItem.getBrandid() != null) {
+            dto.setBrandId(productItem.getBrandid().getBrandID());
+            dto.setBrandName(productItem.getBrandid().getBrandName());
+        }
+
+        // Version info
+        if (productItem.getVersion() != null) {
+            dto.setVersionId(productItem.getVersion().getVersionID());
+            dto.setVersionName(productItem.getVersion().getVersionName());
+        }
+
+        // Tariff Package info
+        if (productItem.getTariffiPackage() != null) {
+            dto.setTariffiPackageId(productItem.getTariffiPackage().getTariffiPackageID());
+            dto.setTariffiPackageName(productItem.getTariffiPackage().getPackageName());
+        }
+
+        // Descripted info
+        if (productItem.getDescripted() != null) {
+            dto.setProductName(productItem.getDescripted().getProductName());
+            dto.setDescriptedProduct(productItem.getDescripted().getDescripted());
+            dto.setAddress(productItem.getDescripted().getAddress());
+            dto.setWarrantyPeriod(productItem.getDescripted().getWarrantyPeriod());
+        }
+
+        // SellCategory info
+        if (productItem.getSellCategory() != null) {
+            dto.setSellCategoryId(productItem.getSellCategory().getSellCategoryID());
+        }
+
+        return dto;
+    }
+
+    // Method để tạo và trả về DTO thay vì entity
+    @Transactional
+    public ProductItemResponseDTO createProductItemAndReturnDTO(PushProductItemDTO dto, String username) throws Exception {
+        ProductItem savedItem = createProductItem(dto, username);
+        return convertToResponseDTO(savedItem);
+    }
+}
