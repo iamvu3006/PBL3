@@ -168,6 +168,51 @@
       .login-left img { width:50%; margin:1rem 0; }
       .login-right { padding:2rem 1.5rem; }
     }
+    .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: slideIn 0.5s ease;
+}
+
+.toast-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.toast-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
   </style>
 </head>
 <body>
@@ -180,6 +225,10 @@
 
     <form id="login-form" class="login-form">
       <div id="error-message" class="alert alert-danger" style="display:none;"></div>
+<div id="success-message" class="alert alert-success" style="display:none;">
+  <i class="fas fa-check-circle"></i>
+  <span></span>
+</div>
 
        <div class="form-group">
         <label for="login-username">Tên đăng nhập</label>
@@ -231,6 +280,15 @@
   </div>
 </div>
 
+<div id="success-toast" class="toast toast-success" style="display: none;">
+    <i class="fas fa-check-circle"></i>
+    <span>Đăng nhập thành công!</span>
+</div>
+
+<div id="error-toast" class="toast toast-error" style="display: none;">
+    <i class="fas fa-exclamation-circle"></i>
+    <span></span>
+</div>
 <script>
   // document.getElementById('login-form').addEventListener('submit', function(e) {
   //   e.preventDefault(); 
@@ -326,51 +384,72 @@
 
     const username = document.getElementById('login-username').value;
     const password = document.getElementById('login-password').value;
-    const errorElement = document.getElementById('error-message');
+    const successToast = document.getElementById('success-toast');
+    const errorToast = document.getElementById('error-toast');
 
-    errorElement.textContent = '';
-    errorElement.style.display = 'none';
+    // Ẩn thông báo cũ nếu có
+    successToast.style.display = 'none';
+    errorToast.style.display = 'none';
 
     const loginData = { username, password };
 
     fetch('/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify(loginData)
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify(loginData)
     })
     .then(response => {
-      if (!response.ok) {
-        return response.text().then(text => {
-          throw new Error(text || `HTTP error ${response.status}`);
-        });
-      }
-      return response.json();
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(text || `HTTP error ${response.status}`);
+            });
+        }
+        return response.json();
     })
     .then(data => {
-      if (data.success) {
-        // Nếu server trả về role, ví dụ data.role = "ADMIN" hoặc "USER"
-        if (data.role === 'ADMIN') {
-          window.location.href = '/admin';       // Trang dành cho admin
+        if (data.success) {
+            // Hiển thị thông báo thành công
+            successToast.style.display = 'block';
+            
+            // Đợi 2 giây trước khi chuyển hướng
+            setTimeout(() => {
+                if (data.role === 'ADMIN') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/';
+                }
+            }, 2000);
         } else {
-          window.location.href = '/'; // Trang dành cho user
+            // Hiển thị thông báo thất bại
+            errorToast.querySelector('span').textContent = data.message || 'Đăng nhập thất bại';
+            errorToast.style.display = 'block';
+            setTimeout(() => {
+                errorToast.style.animation = 'fadeOut 0.5s ease';
+                setTimeout(() => {
+                    errorToast.style.display = 'none';
+                    errorToast.style.animation = '';
+                }, 500);
+            }, 3000);
         }
-      } else {
-        errorElement.textContent = data.message || 'Đăng nhập thất bại';
-        errorElement.style.display = 'block';
-        errorElement.style.color = 'red';
-      }
     })
     .catch(error => {
-      console.error('Login error:', error);
-      errorElement.textContent = error.message || 'Đã xảy ra lỗi khi đăng nhập';
-      errorElement.style.display = 'block';
-      errorElement.style.color = 'red';
+        console.error('Login error:', error);
+        // Hiển thị thông báo lỗi
+        errorToast.querySelector('span').textContent = 'Đã xảy ra lỗi khi đăng nhập';
+        errorToast.style.display = 'block';
+        setTimeout(() => {
+            errorToast.style.animation = 'fadeOut 0.5s ease';
+            setTimeout(() => {
+                errorToast.style.display = 'none';
+                errorToast.style.animation = '';
+            }, 500);
+        }, 3000);
     });
-  });
+});
 </script>
 </body>
 </html>

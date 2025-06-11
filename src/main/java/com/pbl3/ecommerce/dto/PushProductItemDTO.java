@@ -5,7 +5,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 public class PushProductItemDTO {
     private String descriptedProduct;
     private String productName;
-    private Integer Price;
+    private Double Price;
     private String Address;
     private Integer warranPeriod;
     private Integer productitemId;
@@ -46,11 +46,11 @@ public class PushProductItemDTO {
         this.productName = productName;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return Price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         Price = price;
     }
 

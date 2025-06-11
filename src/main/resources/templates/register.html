@@ -7,6 +7,53 @@
   <link rel="stylesheet" th:href="@{/css/layout.css}">
   <link rel="stylesheet" th:href="@{/css/register.css}">
   <link rel="stylesheet" th:href="@{/css/common.css}">
+  <style>
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        animation: slideIn 0.5s ease;
+    }
+
+    .toast-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .toast-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+</style>
 </head>
 <body>
 <!-- Header giữ nguyên như cũ -->
@@ -74,67 +121,102 @@
 <script>
   /* Phần script xử lý form giữ nguyên */
   document.addEventListener('DOMContentLoaded', () => {
-    const registerForm   = document.getElementById('register-form');
-    const errDiv         = document.getElementById('error-message');
-    const successDiv     = document.getElementById('success-message');
-    const urlParams      = new URLSearchParams(window.location.search);
-    const redirectTo     = urlParams.get('redirect') || '/login';
+    const registerForm = document.getElementById('register-form');
+    const successToast = document.getElementById('success-toast');
+    const errorToast = document.getElementById('error-toast');
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectTo = urlParams.get('redirect') || '/login';
 
     fetch('/api/auth/check-session')
-            .then(r => r.json())
-            .then(data => {
-              if (data.success) window.location.href = '/';
-            })
-            .catch(console.error);
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) window.location.href = '/';
+        })
+        .catch(console.error);
 
     registerForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      errDiv.style.display = 'none';
-      successDiv.style.display = 'none';
+        e.preventDefault();
+        
+        // Ẩn các toast cũ
+        successToast.style.display = 'none';
+        errorToast.style.display = 'none';
 
-      const fullName = document.getElementById('register-fullname').value.trim();
-      const username = document.getElementById('register-username').value.trim();
-      const phone    = document.getElementById('register-phone').value.trim();
-      const email    = document.getElementById('register-email').value.trim();
-      const password = document.getElementById('register-password').value;
-      const address  = document.getElementById('register-address').value.trim();
+        const fullName = document.getElementById('register-fullname').value.trim();
+        const username = document.getElementById('register-username').value.trim();
+        const phone = document.getElementById('register-phone').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const password = document.getElementById('register-password').value;
+        const address = document.getElementById('register-address').value.trim();
 
-      if (!fullName || !username || !phone || !email || !password || !address) {
-        return showError('Vui lòng nhập đầy đủ thông tin');
-      }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) return showError('Email không hợp lệ');
+        // Validate form
+        if (!fullName || !username || !phone || !email || !password || !address) {
+            showError('Vui lòng nhập đầy đủ thông tin');
+            return;
+        }
 
-      try {
-        const resp = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ fullName, username, phoneNumber: phone, email, password, address })
-        });
-        const data = await resp.json();
-        if (!resp.ok || !data.success) throw new Error(data.message || 'Đăng ký thất bại');
-        showSuccess(data.message || 'Đăng ký thành công!');
-        registerForm.reset();
-        setTimeout(() => window.location.href = redirectTo, 2000);
-      } catch (err) {
-        console.error(err);
-        showError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
-      }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showError('Email không hợp lệ');
+            return;
+        }
 
-      function showError(msg) {
-        successDiv.style.display = 'none';
-        errDiv.textContent = msg;
-        errDiv.style.display = 'block';
-      }
-      function showSuccess(msg) {
-        errDiv.style.display = 'none';
-        successDiv.textContent = msg;
-        successDiv.style.display = 'block';
-      }
+        try {
+            const resp = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    fullName,
+                    username,
+                    phoneNumber: phone,
+                    email,
+                    password,
+                    address
+                })
+            });
+
+            const data = await resp.json();
+            if (!resp.ok || !data.success) {
+                throw new Error(data.message || 'Đăng ký thất bại');
+            }
+
+            // Hiển thị thông báo thành công
+            successToast.style.display = 'block';
+            registerForm.reset();
+
+            // Chuyển hướng sau 2 giây
+            setTimeout(() => {
+                window.location.href = redirectTo;
+            }, 2000);
+
+        } catch (err) {
+            console.error(err);
+            showError(err.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+        }
     });
-  });
+
+    function showError(msg) {
+        errorToast.querySelector('span').textContent = msg;
+        errorToast.style.display = 'block';
+        setTimeout(() => {
+            errorToast.style.animation = 'fadeOut 0.5s ease';
+            setTimeout(() => {
+                errorToast.style.display = 'none';
+                errorToast.style.animation = '';
+            }, 500);
+        }, 3000);
+    }
+});
 </script>
 
+<div id="success-toast" class="toast toast-success" style="display: none;">
+    <i class="fas fa-check-circle"></i>
+    <span>Đăng ký thành công!</span>
+</div>
+
+<div id="error-toast" class="toast toast-error" style="display: none;">
+    <i class="fas fa-exclamation-circle"></i>
+    <span></span>
+</div>
 <!-- Chèn footer chung -->
 <div th:insert="layout :: siteFooter"></div>
 
