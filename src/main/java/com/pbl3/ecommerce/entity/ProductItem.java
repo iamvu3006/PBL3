@@ -73,7 +73,6 @@ public class ProductItem {
     @JoinColumn(name = "describeid")
     private Descripted descripted;
 
-
     @OneToMany(mappedBy = "productItem")
     @JsonIgnore
     private List<ProductItemCategory> productItemCategories = new ArrayList<>();
@@ -112,6 +111,14 @@ public class ProductItem {
 
     public AbVersion getVersion() {
         return version;
+    }
+
+    public void setVersion(AbVersion version) {
+        this.version = version;
+    }
+
+    public void setTariffiPackage(TariffiPackage tariffiPackage) {
+        TariffiPackage = tariffiPackage;
     }
 
     public Brand getBrandid() {

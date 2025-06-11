@@ -12,7 +12,7 @@ public class WishListCategory {
     private Integer wishListID;
 
     @OneToOne(mappedBy = "wishListCategory", optional = false)
-    @JsonBackReference
+    @JsonBackReference("client-wishlist")
     private AbClient abClient;
     // Getters and setters
 

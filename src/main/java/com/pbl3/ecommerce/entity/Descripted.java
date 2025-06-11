@@ -14,7 +14,7 @@ public class Descripted {
     private String productName;
 
     @Column(name = "Price")
-    private Integer Price;
+    private Double Price;
 
     @Column(name = "Address")
     private String Address;
@@ -47,11 +47,11 @@ public class Descripted {
         this.productName = productName;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return Price;
     }
 
-    public void setPrice(Integer price) {
+    public void setPrice(Double price) {
         this.Price = price;
     }
 
@@ -74,6 +74,7 @@ public class Descripted {
     public String getDescripted() {
         return Descripted;
     }
+
     public void setDescripted(String descripted) {
         this.Descripted = descripted;
     }
