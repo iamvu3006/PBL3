@@ -16,6 +16,7 @@ import com.pbl3.ecommerce.service.PushProductItemService;
 import com.pbl3.ecommerce.repository.BrandRepository;
 import com.pbl3.ecommerce.repository.SellCategoryRepository;
 import com.pbl3.ecommerce.repository.TariffiPackageRepository;
+import com.pbl3.ecommerce.dto.ProductItemResponseDTO;
 
 @Controller
 @RequestMapping("/api/products")

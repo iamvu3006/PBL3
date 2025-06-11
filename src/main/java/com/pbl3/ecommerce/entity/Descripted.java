@@ -1,4 +1,5 @@
 package com.pbl3.ecommerce.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
